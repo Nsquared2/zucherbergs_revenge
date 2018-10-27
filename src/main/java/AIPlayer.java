@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public abstract class AIPlayer {
     int id;
@@ -6,7 +8,7 @@ public abstract class AIPlayer {
 
     int score;
     ArrayList<ArrayList<String>> action_history;
-    ArrayList<PlayerState> game_state;
+    Map<Integer, PlayerState> game_state = new HashMap<Integer, PlayerState>();
 
     AIPlayer(int id, String name){
         this.id = id;
