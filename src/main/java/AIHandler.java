@@ -4,10 +4,10 @@ public class AIHandler {
     AIHandler(){};
 
     AIPlayer create_ai(String difficulty, int id, String name){
-        AIPlayer ai_player = new AIPlayer(id, name);
+        AIPlayer ai_player;
 
         if(difficulty.equals("easy")){
-
+            ai_player = new EasyAIPlayer(id, name);
         }
         else if(difficulty.equals("medium")){
 
