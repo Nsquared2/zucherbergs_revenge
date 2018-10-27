@@ -2,7 +2,7 @@
 public abstract class Message {
     int sender_id;
     int reciever_id;
-    //TODO: Do we want to reserve id 0 for message sent only to server? Will this every happen?
+    //TODO: Do we want to reserve id 0 for message sent only to server? Will this ever happen?
 
 
     //TODO: Should we have a parse_input method here to check validity of string being used to create message?

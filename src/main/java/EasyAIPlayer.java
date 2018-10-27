@@ -3,7 +3,7 @@ import java.util.Random;
 
 public class EasyAIPlayer extends AIPlayer{
     Random rand = new Random();
-    float comm_thresh = 0.9;
+    float comm_thresh = 0.9f;
 
     EasyAIPlayer(int id, String name){
         super(id, name);
@@ -23,7 +23,7 @@ public class EasyAIPlayer extends AIPlayer{
         }
     }
 
-    abstract Action round_action(ArrayList<Integer> ids) {
+    Action round_action(ArrayList<Integer> ids) {
         int num_coms = CommType.values().length;
 
         for(int reciever: ids) {

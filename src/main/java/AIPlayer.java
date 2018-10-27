@@ -15,7 +15,7 @@ public abstract class AIPlayer {
         this.name = name;
     }
 
-    abstract String message_action();
+    abstract Communication message_action();
 
     abstract Action round_action();
 
