@@ -1,4 +1,5 @@
 // Spark test code
+//YOU CAN DELETE ALL OF THIS
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
