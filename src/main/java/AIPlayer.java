@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -15,9 +16,9 @@ public abstract class AIPlayer {
         this.name = name;
     }
 
-    abstract Communication message_action();
+    abstract Communication message_action(ArrayList<Integer> ids);
 
-    abstract Action round_action();
+    abstract ArrayList<Action> round_action(ArrayList<Integer> ids);
 
-    abstract void update_policy();
+    abstract void update_policy(ArrayList<Integer> ids);
 }

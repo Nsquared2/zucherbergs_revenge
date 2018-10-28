@@ -23,18 +23,20 @@ public class EasyAIPlayer extends AIPlayer{
         }
     }
 
-    Action round_action(ArrayList<Integer> ids) {
-        int num_coms = CommType.values().length;
+    ArrayList<Action> round_action(ArrayList<Integer> ids) {
+        int num_actions = ActionType.values().length;
+        ArrayList<Action> actions = new ArrayList<Action>(0);
 
         for(int reciever: ids) {
-            ActionType action_type = ActionType.values()[rand.nextInt(num_coms)];
+            ActionType action_type = ActionType.values()[rand.nextInt(num_actions)];
 
-            Action comm = new Action(action_type, this.id, reciever);
-            return comm;
+            Action action = new Action(action_type, this.id, reciever);
+            actions.add(action);
         }
 
+        return actions;
     }
 
     //Easy player does not update policy so this function does nothing
-    void update_policy(){}
+    void update_policy(ArrayList<Integer> ids){}
 }

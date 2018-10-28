@@ -13,5 +13,3 @@ public enum ActionType{
         return stringRepresentation;
     }
 }
-
-
