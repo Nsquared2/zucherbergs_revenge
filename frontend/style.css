@@ -1,7 +1,52 @@
-.right-pane{
-  float:right;
+body{
+  margin: 0px;
+  font-family: "Arial";
+  font-size: 16pt;
 }
 
 .left-pane{
   float:left;
+  width:30%;
+}
+
+.players{
+  overflow-y: scroll;
+}
+
+.player-container{
+  padding:10px;
+}
+
+.player{
+  outline: solid;
+  outline-color: rgba(10,100,255,1);
+  padding: 3px;
+  background-color: rgba(220,220,255,1);
+}
+
+.cooperate, .ignore, .betray{
+  display: inline;
+}
+
+.cooperate{
+  color: green;
+}
+
+.ignore{
+  color: black;
+}
+
+.betray{
+  color: red;
+}
+
+button.action{
+  font-size: 16pt;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.right-pane{
+  float:right;
+  width:70%;
 }
