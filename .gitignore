@@ -4,3 +4,4 @@ frontend/.DS_Store
 src/.DS_Store
 src/main/.DS_Store
 target/.DS_Store
+target/
