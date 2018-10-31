@@ -18,7 +18,7 @@
           <div class="request">requesting: <div class="ignore">ignore</div></div>
           <button class="action cooperate">cooperate</button>
           <button class="action ignore">ignore</button>
-          <button class="action betray">betray</button>
+          <button class="action betray selected">betray</button>
         </div>
       </div>
 
@@ -26,7 +26,7 @@
         <div class="player">
           <div class="name">Sarah DiGennaro</div>
           <div class="request">requesting: <div class="cooperate">cooperate</div></div>
-          <button class="action cooperate">cooperate</button>
+          <button class="action cooperate selected">cooperate</button>
           <button class="action ignore">ignore</button>
           <button class="action betray">betray</button>
         </div>
@@ -37,13 +37,63 @@
 
   <div class="right-pane">
 
-    <div>
-      <button>New Game</button>
+    <div class="messages-pane" id="messages-pane">
+
+      <div class="message-container"><div class="message them">message from Ted</div></div>
+      <div class="message-container"><div class="message you">Hi ted this is vincnet</div></div>
+      <div class="message-container"><div class="message server">SERVER MESSaGE</div></div>
+      <div class="message-container"><div class="message them">vincnent shut up</div></div>
+      <div class="message-container"><div class="message them">I hate u vincent</div></div>
+      <div class="message-container"><div class="message you">go suck an egg ted</div></div>
+      <div class="message-container"><div class="message server">Vincent winz this round</div></div>
+      
     </div>
 
-    <div class="join-private">
-      Join a private game<br>
-      <input></input>
+    <div class="controls-pane">
+      
+      <div class="communication-pane">
+
+        <div class="current-player" id="current-player">
+          To: Ted Cruz
+        </div>
+
+
+        Request:
+        <select id="request-select">
+          <option>none</option>
+          <option>cooperate</option>
+          <option>ignore</option>
+          <option>betray</option>
+        </select>
+        <br>
+        Announce:
+        <select id="announce-select">
+          <option>none</option>
+          <option>cooperate</option>
+          <option>ignore</option>
+          <option>betray</option>
+        </select>
+        <br>
+        Action:
+        <select id="action-select">
+          <option>cooperate</option>
+          <option>ignore</option>
+          <option>betray</option>
+        </select>
+        <br>
+
+      </div>
+
+      <div class="game-info-pane">
+        <div class="game-info-container">
+          
+          <div class="score" id="score">Score: 12<br>1st place</div>
+          <div class="round" id="round">Round 8/12</div>
+          <div class="timer" id="timer">2:12 left</div>
+          <button class="confirm" id="confirm">confirm actions</button>
+        </div>
+      </div>
+
     </div>
 
   </div>
