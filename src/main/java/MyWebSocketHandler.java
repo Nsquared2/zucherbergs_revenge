@@ -82,16 +82,22 @@ public class MyWebSocketHandler {
     }
 
     private void parseMessage(String playerId, String commType) {
-        System.out.println(playerId);
-        System.out.println(commType);
         int id = Integer.parseInt(playerId);
+        CommType comm = CommType.valueOf(commType);
+        String message;
+
+        if (comm != null) {
+            message = comm.getMessage();
+        } else {
+            message = "Error, unknown communication type";
+        }
         try {
             // id 0 is the test case
-            System.out.println(id);
             if (id == 0) {
-                currentSess.getRemote().sendString("message " + "server " + commType);
+                currentSess.getRemote().sendString("message " + "server " + message);
+            } else {
+                playerMap.get(id).getRemote().sendString(commType);
             }
-            //playerMap.get(id).getRemote().sendString(commType);
         } catch (IOException e) {
             e.printStackTrace();
         }
