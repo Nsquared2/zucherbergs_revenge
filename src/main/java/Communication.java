@@ -1,5 +1,9 @@
 //TODO: Vincent maybe you can fill this out? Use CommTypes enum
 
+/**
+ * This class represents a communication sent between two players.
+ * A communication contains the CommType and IDs of the sender and receiver.
+ */
 public class Communication extends Message{
     CommType you_do;
     CommType i_do;

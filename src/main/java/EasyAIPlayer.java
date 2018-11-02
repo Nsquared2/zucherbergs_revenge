@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Basic AI player class that corresponds to the Easy difficulty.
+ * This player has deterministic behavior and does not need to be trained by the AI handler.
+ */
 public class EasyAIPlayer extends AIPlayer{
     Random rand = new Random();
     float comm_thresh = 0.9f;
@@ -9,6 +13,9 @@ public class EasyAIPlayer extends AIPlayer{
         super(id, name);
     }
 
+    /**
+     * Returns a new Communication that will be sent to a random player, and has a random communication type.
+     */
     Communication message_action(ArrayList<Integer> ids){
         if(rand.nextFloat() > this.comm_thresh){
             int num_coms = CommType.values().length;
@@ -23,6 +30,9 @@ public class EasyAIPlayer extends AIPlayer{
         }
     }
 
+    /**
+     * Creates a random Action for each of the Player IDs given as input.
+     */
     ArrayList<Action> round_action(ArrayList<Integer> ids) {
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);

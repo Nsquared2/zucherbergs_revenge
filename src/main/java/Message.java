@@ -1,4 +1,6 @@
-//Interface for all messages to go through server
+/**
+ * Interface for all messages to go through server
+ */
 public abstract class Message {
     int sender_id;
     int reciever_id;
