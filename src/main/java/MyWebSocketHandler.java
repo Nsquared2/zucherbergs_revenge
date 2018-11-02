@@ -118,15 +118,15 @@ public class MyWebSocketHandler {
      */
     private void parseMessage(String playerId, String commType) {
         int id = Integer.parseInt(playerId);
-        CommType comm = CommType.valueOf(commType);
-        String message;
+        String message = commType;
 
-        if (comm != null) {
-            message = comm.getMessage();
-        } else {
-            message = commType;
-            //message = "Error, unknown communication type";
+        // Try to find the message text for the given comm type
+        for (CommType t : CommType.values()) {
+            if (t.toString().equals(commType)) {
+                message = t.getMessage();
+            }
         }
+
         try {
             // id 0 is the test case
             if (id == 0) {
