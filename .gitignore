@@ -6,4 +6,4 @@ src/main/.DS_Store
 target/.DS_Store
 target/
 *.class
-zucherburgs_revenge.iml
+*.iml
