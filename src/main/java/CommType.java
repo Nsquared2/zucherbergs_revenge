@@ -1,5 +1,10 @@
 //TODO: @Vincent: Verify we don't need new CommType class and can just use ActionType for both action and comm? See Communication implementation. Do we need blank?
 
+/**
+ * This enum represents the six different pre-determined messages that players can send to each other.
+ * Each CommType has a name to be exchanged between the server and client, and a full
+ * message text that will be displayed to the user receiving the communciation.
+ */
 public enum CommType{
     REQUEST_COOP("request_cooperate", "You have been requested to select cooperate"),
     REQUEST_BETRAY("request_betray", "You have been requested to select betray"),
@@ -8,16 +13,16 @@ public enum CommType{
     PROMISE_BETRAY("promise_betray", "You have received a promise for betrayal"),
     PROMISE_IGNORE("promise_ignore", "You have received a promise for ignore");
 
-    private String stringRepresentation;
+    private String name;
     private String message;
 
-    CommType(String rep, String message) {
-        this.stringRepresentation = rep;
+    CommType(String name, String message) {
+        this.name = name;
         this.message = message;
     }
 
     public String toString() {
-        return stringRepresentation;
+        return name;
     }
 
     public String getMessage() {

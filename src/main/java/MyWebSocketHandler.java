@@ -89,7 +89,8 @@ public class MyWebSocketHandler {
         if (comm != null) {
             message = comm.getMessage();
         } else {
-            message = "Error, unknown communication type";
+            message = commType;
+            //message = "Error, unknown communication type";
         }
         try {
             // id 0 is the test case
