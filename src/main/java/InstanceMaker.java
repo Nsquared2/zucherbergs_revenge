@@ -12,12 +12,12 @@ public class InstanceMaker {
 
     static int num_attrs = 6;
 
-    static HashMap<Object, Integer> index_map = MapUtil.zipToHashMap(Arrays.asList(CommType.values()), MapUtil.range(0, 6));
+    static HashMap<Object, Integer> index_map = Util.zipToHashMap(Arrays.asList(CommType.values()), Util.range(0, 6));
 
     /**
      * Takes communications for round and returns
      */
-    public static DenseInstance makeInstance(ArrayList<Communication> comms){
+    public static DenseInstance makeInstance(Collection<Communication> comms){
         DenseInstance instance = new DenseInstance(num_attrs);
         int[] comm_vector = new int[6]; //array of zeros
 
@@ -35,4 +35,6 @@ public class InstanceMaker {
 
         return instance;
     }
+
+
 }

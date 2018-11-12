@@ -26,7 +26,7 @@ public abstract class AIPlayer extends Object{
         this.name = name;
         this.enemy_ids = ids;
         this.enemy_ids.remove(Integer.valueOf(id));
-        this.num_enemies = enemy_ids.size()
+        this.num_enemies = enemy_ids.size();
 
         this.rcv_comms = new ArrayList<Multimap<Integer, Communication>>();
 

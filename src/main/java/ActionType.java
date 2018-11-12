@@ -13,6 +13,7 @@ public enum ActionType{
         this.stringRepresentation = rep;
     }
 
+
     public String toString() {
         return stringRepresentation;
     }

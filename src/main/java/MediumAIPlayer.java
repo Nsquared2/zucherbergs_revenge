@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.google.common.primitives.Floats;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
 import weka.core.DenseInstance;
@@ -51,29 +52,30 @@ public class MediumAIPlayer extends AIPlayer{
         }
     }
 
-    /**
-     * Makes a instance from messages for use by model
-     */
-    Instance getInstance(int round_id, int enemy_id){
-       DenseInstance instance = new DenseInstance(6);
-       for(Communication comm: this.rcv_comms.get(round_id).get(enemy_id)){
-           int comm_counts = 5;
-       }
-        //instance.setValue(key, comm_counts);
-        return instance;
-    }
 
     /**
-     * Creates a random Action for each of the Player IDs given as input.
+     * Creates an Action for each of the Player IDs given as input using Naive Bayes model
      */
     ArrayList<Action> round_action() {
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
+        int round_id = rcv_comms.size();
 
-        for(int reciever: this.enemy_ids) {
-            ActionType action_type = ActionType.values()[rand.nextInt(num_actions)];
+        for(int enemy: this.enemy_ids) {
+            DenseInstance instance = InstanceMaker.makeInstance(rcv_comms.get(round_id).get(enemy));
+            double[] distribution;
+            try {
+                 distribution = this.models.get(enemy_ids).distributionForInstance(instance);
+            }
+            catch (Exception e){
+                System.out.println("Error in MediumAIPlayer model evaluation " + e.toString());
+                System.exit(0);
+            }
 
-            Action action = new Action(action_type, this.id, reciever);
+            //TODO: Take into account prior
+            int max_action = Util.argmax(distribution);
+            ActionType action_type = Util.EnumIndexToValue(ActionType.class, max_action);
+            Action action = new Action(action_type, this.id, enemy);
             actions.add(action);
         }
 
@@ -81,6 +83,19 @@ public class MediumAIPlayer extends AIPlayer{
     }
 
     void update_policy(){}
+
+
+    /**
+     * Makes a instance from messages for use by model
+     */
+    Instance getInstance(int round_id, int enemy_id){
+        DenseInstance instance = new DenseInstance(6);
+        for(Communication comm: this.rcv_comms.get(round_id).get(enemy_id)){
+            int comm_counts = 5;
+        }
+        //instance.setValue(key, comm_counts);
+        return instance;
+    }
 }
 
 
