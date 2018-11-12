@@ -1,16 +1,19 @@
 import java.util.ArrayList;
-import java.util.Random;
+import org.apache.spark.mllib.classification.NaiveBayes;
+import org.apache.spark.mllib.classification.NaiveBayesModel;
 
 /**
- * Basic AI player class that corresponds to the Easy difficulty.
- * This player has random behavior and does not need to be trained by the AI handler.
+ * Basic AI player class that corresponds to the Medium difficulty.
+ * This player has deterministic behavior and needs to be trained by the AI handler.
+ * Trains using Naive Bayes
  */
-public class EasyAIPlayer extends AIPlayer{
-    private Random rand = new Random();
+public class MediumAIPlayer extends AIPlayer{
+    private NaiveBayesModel nbayes;
     private float comm_thresh = 0.9f;
 
-    EasyAIPlayer(int id, String name){
+    MediumAIPlayer(int id, String name, NaiveBayesModel model){
         super(id, name);
+        this.nbayes = model;
     }
 
     /**
@@ -47,6 +50,8 @@ public class EasyAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Easy player does not update policy so this function does nothing
+    //Medium player does not update policy so this function does nothing
     void update_policy(ArrayList<Integer> ids){}
 }
+
+

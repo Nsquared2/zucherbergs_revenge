@@ -1,5 +1,8 @@
 //import org.apache.spark.ml.classification.LogisticRegression;
 
+//https://databricks.com/blog/2016/05/31/apache-spark-2-0-preview-machine-learning-model-persistence.html
+//https://stackoverflow.com/questions/33556543/how-to-save-model-and-apply-it-on-a-test-dataset-on-java
+//https://www.youtube.com/watch?v=wSB5oByt7ko
 /**
  * This class is responsible for maintaining the currently active AI players, creating new AI players,
  * and training the different difficulty levels.

@@ -2,14 +2,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Basic AI player class that corresponds to the Easy difficulty.
- * This player has random behavior and does not need to be trained by the AI handler.
+ * Basic AI player class that corresponds to the Hard difficulty.
+ * This player has deterministic behavior and needs to be trained by the AI handler.
+ * Trains using multi layer perceptron base policy and naive bayes online learning
  */
-public class EasyAIPlayer extends AIPlayer{
-    private Random rand = new Random();
-    private float comm_thresh = 0.9f;
 
-    EasyAIPlayer(int id, String name){
+public class HardAIPlayer extends AIPlayer{
+    Random rand = new Random();
+    float comm_thresh = 0.9f;
+
+    HardAIPlayer(int id, String name){
         super(id, name);
     }
 
@@ -47,6 +49,6 @@ public class EasyAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Easy player does not update policy so this function does nothing
+    //Hard player does not update policy so this function does nothing
     void update_policy(ArrayList<Integer> ids){}
 }
