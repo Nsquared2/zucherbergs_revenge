@@ -1,8 +1,8 @@
 import java.util.*;
 
-import weka.core.DenseInstance;
+import weka.core.*;
 
-public class InstanceMaker {
+public class WekaData {
     //holds communications counts between 2 players for current rounds
     static int[] comm_vector = new int[6];
 
@@ -13,6 +13,24 @@ public class InstanceMaker {
     static int num_attrs = 6;
 
     static HashMap<Object, Integer> index_map = Util.zipToHashMap(Arrays.asList(CommType.values()), Util.range(0, 6));
+
+    /**
+     * Create dataset from xml file
+     */
+    public static Instances makeDataset(String path){
+        ArrayList<Attribute> atts = new ArrayList<Attribute>();
+
+        for(int i  = 0; i < num_attrs; i++) {
+            Attribute x = new Attribute("x"+ Integer.toString(i), i);
+            atts.add(x);
+        }
+        Attribute y = new Attribute("y", num_attrs);
+        atts.add(y);
+
+        Instances dataset = new Instances("Dataset", atts, 50000);
+
+        return dataset;
+    }
 
     /**
      * Takes communications for round and returns

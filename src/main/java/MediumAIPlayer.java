@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.google.common.primitives.Floats;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
 import weka.core.DenseInstance;
@@ -62,14 +61,14 @@ public class MediumAIPlayer extends AIPlayer{
         int round_id = rcv_comms.size();
 
         for(int enemy: this.enemy_ids) {
-            DenseInstance instance = InstanceMaker.makeInstance(rcv_comms.get(round_id).get(enemy));
+            DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy));
             double[] distribution;
             try {
                  distribution = this.models.get(enemy_ids).distributionForInstance(instance);
             }
             catch (Exception e){
                 System.out.println("Error in MediumAIPlayer model evaluation " + e.toString());
-                System.exit(0);
+                distribution = new double[3]; //TODO: replace with action_num
             }
 
             //TODO: Take into account prior

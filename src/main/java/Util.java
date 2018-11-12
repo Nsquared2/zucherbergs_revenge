@@ -42,6 +42,18 @@ public class Util {
         return max_id;
     }
 
+    public static int argmax(double[] arr){
+        double max = arr[0];
+        int max_id = 0;
+
+        for(int i = 0; i < arr.length; i+=1){
+            if(arr[i] > max)
+                max_id = i;
+        }
+
+        return max_id;
+    }
+
     public static  <E extends Enum<E>> E EnumIndexToValue(Class<E> my_enum, int index){
         List<E> vals = Arrays.asList(my_enum.getEnumConstants());
         return vals.get(index);
