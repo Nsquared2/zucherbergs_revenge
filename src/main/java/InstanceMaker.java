@@ -1,6 +1,4 @@
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import weka.core.DenseInstance;
 
@@ -14,16 +12,27 @@ public class InstanceMaker {
 
     static int num_attrs = 6;
 
-    static Map id_map = MapUtil.zipToMap(MapUtil.range(0, 6), Arrays.asList(CommType.values()));
+    static HashMap<Object, Integer> index_map = MapUtil.zipToHashMap(Arrays.asList(CommType.values()), MapUtil.range(0, 6));
 
+    /**
+     * Takes communications for round and returns
+     */
     public static DenseInstance makeInstance(ArrayList<Communication> comms){
-        DenseInstance Instance = new DenseInstance(this.num_attrs);
-        for(int i=0; i < this.num_attrs; i+=1){
+        DenseInstance instance = new DenseInstance(num_attrs);
+        int[] comm_vector = new int[6]; //array of zeros
+
+        for(int i=0; i < num_attrs; i+=1){
             for(Communication comm: comms){
-                i
+                //TODO: Verify this with Communication structure
+                int index = index_map.get(comm.getAction());
+                comm_vector[index] += 1;
             }
         }
 
-    }
+        for(int i=0; i < num_attrs; i+=1){
+            instance.setValue(i, comm_vector[i]);
+        }
 
+        return instance;
+    }
 }

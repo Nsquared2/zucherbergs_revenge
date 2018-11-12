@@ -21,11 +21,6 @@ public enum CommType{
         this.message = message;
     }
 
-    public static int getIndex(String CommType){
-        if(CommType == REQUEST_COOP)
-            return 0
-    }
-
     public String toString() {
         return name;
     }
