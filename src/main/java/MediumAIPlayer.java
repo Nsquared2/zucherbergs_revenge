@@ -1,6 +1,5 @@
 import java.util.ArrayList;
-import org.apache.spark.mllib.classification.NaiveBayes;
-import org.apache.spark.mllib.classification.NaiveBayesModel;
+import weka.classifiers.Classifier;
 
 /**
  * Basic AI player class that corresponds to the Medium difficulty.
@@ -8,10 +7,9 @@ import org.apache.spark.mllib.classification.NaiveBayesModel;
  * Trains using Naive Bayes
  */
 public class MediumAIPlayer extends AIPlayer{
-    private NaiveBayesModel nbayes;
     private float comm_thresh = 0.9f;
 
-    MediumAIPlayer(int id, String name, NaiveBayesModel model){
+    MediumAIPlayer(int id, String name){
         super(id, name);
         this.nbayes = model;
     }
@@ -21,12 +19,7 @@ public class MediumAIPlayer extends AIPlayer{
      */
     Communication message_action(ArrayList<Integer> ids){
         if(rand.nextFloat() > this.comm_thresh){
-            int num_coms = CommType.values().length;
-            CommType comm_type = CommType.values()[rand.nextInt(num_coms)];
-            int receiver = ids.get(rand.nextInt(ids.size()));
 
-            Communication comm = new Communication(comm_type, this.id, receiver);
-            return comm;
         }
         else{
             return null;
@@ -50,7 +43,6 @@ public class MediumAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Medium player does not update policy so this function does nothing
     void update_policy(ArrayList<Integer> ids){}
 }
 
