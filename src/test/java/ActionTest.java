@@ -6,7 +6,9 @@ public class ActionTest {
 
     @Test
     public void basicActionTest() {
-        Action a = new Action(ActionType.BETRAY);
-        assertEquals("betray", a.toString());
+        for (ActionType type : ActionType.values()) {
+            Action a = new Action(type);
+            assertEquals(type.toString(), a.toString());
+        }
     }
 }

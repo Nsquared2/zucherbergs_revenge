@@ -1,3 +1,8 @@
+/**
+ * This class represents an Action taken on behalf of a given player, towards a recipient player.
+ * Actions can come from a set of ActionTypes, and store the IDs of the sending/receiving players.
+ */
+
 public class Action extends Message{
     ActionType action;
 
@@ -16,5 +21,8 @@ public class Action extends Message{
         this.reciever_id = reciever_id;
     }
 
+    /**
+     * Delegates the toString call to the ActionType enum to get a meaningful desc. of the action
+     */
     public String toString() {return action.toString();}
 }
