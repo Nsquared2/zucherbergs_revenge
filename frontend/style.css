@@ -137,6 +137,44 @@ select{
 
 
 
+/* for newgame and index*/
+
+.small-right-pane{
+  float:right;
+  width: 50%;
+  height: 100%;
+  margin: 0px;
+}
+
+.large-left-pane{
+  float:left;
+  width:50%;
+  height:100%;
+}
+
+.padded{
+  padding:10px;
+}
+
+.open-game:nth-child(odd){
+  background-color: rgba(220,240,220,1);
+  border-radius: 8px;
+}
+
+.open-game:nth-child(even){
+  background-color: rgba(200,220,240,1);
+  border-radius: 8px;
+}
+
+form input{
+  float:right;
+}
+
+form{
+  padding-left:10px;
+  line-height: 2;
+}
+
 
 
 
