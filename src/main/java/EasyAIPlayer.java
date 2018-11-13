@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -48,5 +49,5 @@ public class EasyAIPlayer extends AIPlayer{
     }
 
     //Easy player does not update policy so this function does nothing
-    void update_policy(){}
+    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){}
 }

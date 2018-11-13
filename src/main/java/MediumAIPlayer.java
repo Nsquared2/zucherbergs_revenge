@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -14,19 +15,19 @@ import weka.core.Instance;
  */
 public class MediumAIPlayer extends AIPlayer{
     NaiveBayesUpdateable base_model;
-    HashMap<Integer, Classifier> models;
+    HashMap<Integer, NaiveBayesUpdateable> models;
     private float comm_thresh = 0.9f;
     private Random rand = new Random();
 
     MediumAIPlayer(int id, String name, ArrayList<Integer> ids, NaiveBayesUpdateable model){
         super(id, name, ids);
         this.base_model = model;
-        this.models = new HashMap<Integer, Classifier>();
+        this.models = new HashMap<Integer, NaiveBayesUpdateable>();
 
         // Assign a model for each other player
         for(int enemy_id: this.enemy_ids) {
             try {
-                models.put(enemy_id, NaiveBayesUpdateable.makeCopy(this.base_model));
+                models.put(enemy_id, (NaiveBayesUpdateable) NaiveBayesUpdateable.makeCopy(this.base_model));
             }
             catch (Exception e){
                 System.out.println("Exception in MediumAIPlayer model creation " + e);
@@ -73,15 +74,25 @@ public class MediumAIPlayer extends AIPlayer{
 
             //TODO: Take into account prior
             int max_action = Util.argmax(distribution);
-            ActionType action_type = Util.EnumIndexToValue(ActionType.class, max_action);
-            Action action = new Action(action_type, this.id, enemy);
+            ActionType enemy_action = Util.EnumIndexToValue(ActionType.class, max_action);
+            ActionType my_action = this.maximizeValue(enemy_action);
+            Action action = new Action(my_action, this.id, enemy);
             actions.add(action);
         }
 
         return actions;
     }
 
-    void update_policy(){}
+    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
+        int round_id = rcv_comms.size();
+        for(int key: this.models.keySet()){
+            NaiveBayesUpdateable model = this.models.get(key);
+            Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
+            DenseInstance instance = WekaData.makeInstance(comms);
+            try{ model.updateClassifier(instance);}
+            catch (Exception e) {System.out.println("Exception in medium AI update " + e.toString());}
+        }
+    }
 
 
     /**

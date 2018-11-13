@@ -32,6 +32,21 @@ public abstract class AIPlayer extends Object{
 
     }
 
+    ActionType maximizeValue(ActionType enemy_action){
+        //TODO: @Vincent Redo action table
+        //TODO: @Mike create maximize_reward and minimize_risk modes
+        switch(enemy_action){
+            case COOPERATE:
+                return ActionType.COOPERATE;
+            case BETRAY:
+                return ActionType.IGNORE;
+            case IGNORE:
+                return ActionType.COOPERATE;
+            default:
+                return ActionType.IGNORE;
+        }
+    }
+
     /**
      * Receives a message from another player for the round and stores it
      */
@@ -57,5 +72,5 @@ public abstract class AIPlayer extends Object{
     /**
      * Updates the AI's current decision making policy.
      */
-    abstract void update_policy();
+    abstract void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results);
 }
