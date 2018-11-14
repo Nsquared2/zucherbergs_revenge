@@ -5,8 +5,10 @@
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
 import weka.classifiers.functions.SGD;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
+import weka.core.converters.ConverterUtils;
 
 import java.util.ArrayList;
 
@@ -20,11 +22,14 @@ public class AIHandler {
     static String model_path = "./models/";
     static String medium_model_path = model_path + "medium.model";
     static String hard_model_path = model_path + "hard.model";
+    static String data_path = "./data/";
+    static String data_file_name_prefix = "game";
 
     AIHandler() {
         Instances dataset = WekaData.makeDataset();
     }
 
+    // ************ Game Start Interface **********************
     /**
      * Creates a new AI player based on the input parameters.
      * @param difficulty Selects a difficulty from 'easy', 'medium', or 'hard'
@@ -57,6 +62,42 @@ public class AIHandler {
         return ai_player;
     }
 
+
+    // ************ Game End Interface **********************
+    /**
+     * This method handles the training procedures for the medium and hard policies.
+     * The easy difficulty does not require training, as the behavior is deterministic.
+     */
+    void train_base_policies(){
+        //easy policy is deterministic so never trained
+
+        //medium policy training procedure
+
+        //hard policy training procedure
+    };
+
+    /**
+     * Adds the round observations of all the AI players to the database for future base policy training
+     * @param players Arraylist of all AI players that participated in the game
+     */
+    void save_ai_player_observations(ArrayList<AIPlayer> players) {
+        Instances dataset = WekaData.makeDataset();
+        for (AIPlayer player : players) {
+            //TODO: Append to ARFF file
+            dataset = Instances();
+        }
+
+        //TODO: load game id
+        int game_id = 0;
+        try {
+            ConverterUtils.DataSink.write(data_file_name_prefix + Integer.toString(game_id), dataset);
+        }
+        catch (Exception e){
+            System.out.println("Exception: Game data not saved " + e.toString());
+        }
+    }
+
+    // ************ Utility **********************
     /**
      * Initialize a model from saved data or create a new untrained model if none exists
      * @param model initialized model of classifier type C
@@ -76,16 +117,13 @@ public class AIHandler {
     }
 
     /**
-     * This method handles the training procedures for the medium and hard policies.
-     * The easy difficulty does not require training, as the behavior is deterministic.
+     * Takes two datasets and merges them
+     * @param dataset1 An Instances object
+     * @param dataset2 Another Instances object
+     * @return The merged instances object
      */
-    void train_base_policies(){
-        //easy policy is deterministic so never trained
-
-        //medium policy training procedure
-
-        //hard policy training procedure
-    };
-
-
+    public Instances mergeInstances(Instances dataset1, Instances dataset2){
+        //TODO: Implement
+        return WekaData.makeDataset();
+    }
 }

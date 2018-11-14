@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import weka.core.Instance;
+import weka.core.Instances;
+
 /**
  * This class stores basic information about an AI Player and allows actions/messages to be retrieved from the player.
  * This is an abstract class, so the different AI difficulties will implement the message/action/policy updating in different ways.
@@ -15,6 +16,7 @@ public abstract class AIPlayer extends Object{
     protected ArrayList<Integer> enemy_ids;
     protected int num_enemies;
     protected ArrayList<Multimap<Integer, Communication>> rcv_comms;
+    protected Instances round_instances;
     protected Multimap<Integer, Communication> map_template;
 
     int score;
@@ -82,7 +84,7 @@ public abstract class AIPlayer extends Object{
     abstract ArrayList<Action> round_action();
 
     /**
-     * Updates the AI's current decision making policy.
+     * Updates the AI's current decision making policy and store round_results in round_actions
      */
     abstract void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results);
 }

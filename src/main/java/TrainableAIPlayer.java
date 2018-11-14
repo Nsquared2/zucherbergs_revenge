@@ -90,9 +90,15 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
         int round_id = rcv_comms.size();
         for(int key: this.models.keySet()){
+            //Make instance from round data
             C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
             DenseInstance instance = WekaData.makeInstance(comms);
+
+            //Update round history
+            this.round_instances.add(instance);
+
+            //Update classifier
             try{ model.updateClassifier(instance);}
             catch (Exception e) {System.out.println("Exception in trainable AI update " + e.toString());}
         }
