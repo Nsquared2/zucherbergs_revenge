@@ -84,7 +84,7 @@ public class AIHandler {
         Instances dataset = WekaData.makeDataset();
         for (AIPlayer player : players) {
             //TODO: Append to ARFF file
-            dataset = Instances();
+            dataset = dataset;
         }
 
         //TODO: load game id
