@@ -2,13 +2,15 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Player {
     private String playerName;
     private int playerId;
     private Session webSocketSession;
-    private List<Action> currentActions;
+    private Map<Integer, ActionType> currentActions;
     private boolean turnConfirmed;
     private int currentScore;
     private GameSession gameSession;
@@ -21,7 +23,7 @@ public class Player {
         this.webSocketSession = webSocketSession;
         this.gameSession = gameSession;
 
-        this.currentActions = new ArrayList<>();
+        this.currentActions = new HashMap<>();
         this.turnConfirmed = false;
         this.currentScore = 0;
     }
@@ -44,5 +46,9 @@ public class Player {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateAction(int playerId, ActionType action) {
+        currentActions.put(playerId, action);
     }
 }
