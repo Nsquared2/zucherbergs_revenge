@@ -2,8 +2,17 @@ var Player = function(id, name){
   this.id = id;
   this.name = name;
   this.action = "ignore";
+  this.unread = false;
   this.requesting = "none";
   this.announce = "none";
+}
+
+Player.prototype.html = function(){
+  return  '<div class="player-container" onclick="game.focusOn('+this.id+');"><div class="player"><div class="name">'+this.name+'</div><div class="request">requesting: <div class="'+this.requesting+'">'+this.requesting+'</div></div>'+
+          '<button class="action cooperate '+((this.action == "cooperate") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'cooperate\');">cooperate</button>'+
+          '<button class="action ignore '+((this.action == "ignore") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'ignore\');">ignore</button>'+
+          '<button class="action betray '+((this.action == "betray") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'betray\');">betray</button>'+
+          '</div></div>';
 }
 
 var You = function(id){
@@ -20,11 +29,13 @@ var Game = function(name, rounds, time_limit, you){
   this.time_limit = time_limit;
   this.you = you;
   this.players = [];
+  this.currentPlayer = false;
 }
 
 // adds a player to the game
 Game.prototype.addPlayer = function(player){
   this.players.push(player);
+  this.updatePlayers();
 }
 
 // gets a player by their ID
@@ -36,6 +47,55 @@ Game.prototype.getPlayer = function(id){
   }
   return false;
 }
+
+Game.prototype.updateCurrentPlayer = function(){
+  messages = document.getElementById("messages-pane");
+  
+  document.getElementById("current-player").innerHTML = "to: "+this.currentPlayer.name;
+  document.getElementById("request-select").value = this.currentPlayer.requesting;
+  document.getElementById("announce-select").value = this.currentPlayer.announce;
+  document.getElementById("action-select").value = this.currentPlayer.action;
+}
+
+Game.prototype.focusOn = function(id){
+  this.currentPlayer = this.getPlayer(id);
+  this.updateCurrentPlayer();
+}
+
+Game.prototype.updatePlayers = function(){
+  p = document.getElementById("players");
+  p.innerHTML = "";
+  for(i in this.players){
+    p.innerHTML += this.players[i].html();
+  }
+}
+
+Game.prototype.changeAction = function(player_id, action){
+  this.getPlayer(player_id).action = action;
+
+  this.updatePlayers();
+
+  message = "action "+player_id+" "+action;
+  ws.send(message);
+  console.log("OUT: "+message);
+}
+
+var UI = function(){
+  this.players = document.getElementById("players");
+  this.messages = document.getElementById("messages-pane");
+}
+
+me = new You(1337);
+game = new Game("GAMENAME", "4", false, me);
+
+player = new Player(20,"Paul");
+game.addPlayer(player);
+
+player = new Player(11,"Stebe");
+game.addPlayer(player);
+
+player = new Player(0,"Sarah");
+game.addPlayer(player);
 
 var ws = new WebSocket("ws://172.20.34.59:8090/");
 

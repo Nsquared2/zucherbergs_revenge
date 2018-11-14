@@ -25,7 +25,7 @@ body{
   background-color: rgba(220,220,255,1);
 }
 
-.cooperate, .ignore, .betray{
+.cooperate, .ignore, .betray, .none{
   display: inline;
 }
 
@@ -39,6 +39,10 @@ body{
 
 .betray{
   color: red;
+}
+
+.none{
+  color: gray;
 }
 
 button{
