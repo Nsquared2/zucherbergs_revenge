@@ -16,7 +16,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 public class MyWebSocketHandler {
 
     private Session currentSess;
-    private Map<Integer, Session> playerMap = new HashMap<Integer, Session>();
+    private Map<Integer, Session> playerMap = new HashMap<>();
+    private List<GameSession> currentGames = new ArrayList<>();
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
@@ -92,6 +93,16 @@ public class MyWebSocketHandler {
         } else if (strangs.get(0).equals("action")) {
             parseAction(strangs.get(1), strangs.get(2));
         }
+    }
+
+    private void parseCreateNewSession(String message) {
+        GameSession g = new GameSession();
+        currentGames.add(g);
+    }
+
+    private void parseAddNewPlayer(String playerName, GameSession game, Session socketSess) {
+        Player p = new Player(playerName, generatePlayerId(socketSess), socketSess, game);
+        game.addPlayer(p);
     }
 
     /**
