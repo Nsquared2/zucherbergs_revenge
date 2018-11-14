@@ -10,16 +10,18 @@ import weka.core.Instance;
  * This is an abstract class, so the different AI difficulties will implement the message/action/policy updating in different ways.
  */
 public abstract class AIPlayer extends Object{
-    int id;
-    String name;
-    ArrayList<Integer> enemy_ids;
-    int num_enemies;
-    ArrayList<Multimap<Integer, Communication>> rcv_comms;
-    Multimap<Integer, Communication> map_template;
+    protected int id;
+    private String name;
+    protected ArrayList<Integer> enemy_ids;
+    protected int num_enemies;
+    protected ArrayList<Multimap<Integer, Communication>> rcv_comms;
+    protected Multimap<Integer, Communication> map_template;
 
     int score;
     ArrayList<ArrayList<String>> action_history;
     Map<Integer, PlayerState> game_state = new HashMap<Integer, PlayerState>();
+
+    AIPlayer(){}
 
     AIPlayer(int id, String name, ArrayList<Integer> ids){
         this.id = id;
@@ -57,6 +59,16 @@ public abstract class AIPlayer extends Object{
 
         this.rcv_comms.get(round_id).put(msg.sender_id, msg);
     }
+
+    /**
+     * Returns name of player
+     */
+    String getName(){return this.name;}
+
+    /**
+     * Returns id of player
+     */
+    int getId(){return this.id;}
 
     /**
      * Returns the Communication that the AI would like to send.

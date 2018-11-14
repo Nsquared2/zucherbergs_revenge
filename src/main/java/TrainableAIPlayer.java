@@ -3,36 +3,35 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
-import weka.classifiers.functions.SGD;
+import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Classifier;
+import weka.classifiers.UpdateableClassifier;
 import weka.core.DenseInstance;
 import weka.core.Instance;
-import weka.core.SelectedTag;
 
 /**
- * Basic AI player class that corresponds to the Hard difficulty.
+ * Basic AI player class that corresponds to the Medium difficulty.
  * This player has deterministic behavior and needs to be trained by the AI handler.
- * Trains using multi layer perceptron base policy and naive bayes online learning
+ * Trains using Naive Bayes
  */
-
-public class HardAIPlayer extends AIPlayer{
-    SGD base_model;
-    HashMap<Integer, SGD> models;
+public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> extends AIPlayer{
+    C base_model;
+    HashMap<Integer, C> models;
     private float comm_thresh = 0.9f;
     private Random rand = new Random();
 
-    HardAIPlayer(int id, String name, ArrayList<Integer> ids, SGD model){
+    TrainableAIPlayer(int id, String name, ArrayList<Integer> ids, C model){
         super(id, name, ids);
         this.base_model = model;
-        model.setLossFunction(new SelectedTag(SGD.LOGLOSS, SGD.TAGS_SELECTION));
-        this.models = new HashMap<Integer, SGD>();
+        this.models = new HashMap<Integer, C>();
 
         // Assign a model for each other player
         for(int enemy_id: this.enemy_ids) {
             try {
-                models.put(enemy_id, (SGD) SGD.makeCopy(this.base_model));
+                models.put(enemy_id, (C) AbstractClassifier.makeCopy(this.base_model));
             }
             catch (Exception e){
-                System.out.println("Exception in HardAIPlayer model creation " + e);
+                System.out.println("Exception in TrainableAIPlayer model creation " + e);
             }
         }
     }
@@ -57,7 +56,7 @@ public class HardAIPlayer extends AIPlayer{
 
 
     /**
-     * Creates an Action for each of the Player IDs given as input using SGD model
+     * Creates an Action for each of the Player IDs given as input using C model
      */
     @Override
     ArrayList<Action> round_action() {
@@ -72,7 +71,7 @@ public class HardAIPlayer extends AIPlayer{
                 distribution = this.models.get(enemy_ids).distributionForInstance(instance);
             }
             catch (Exception e){
-                System.out.println("Error in HardAIPlayer model evaluation " + e.toString());
+                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
                 distribution = new double[World.num_actions()];
             }
 
@@ -91,11 +90,11 @@ public class HardAIPlayer extends AIPlayer{
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
         int round_id = rcv_comms.size();
         for(int key: this.models.keySet()){
-            SGD model = this.models.get(key);
+            C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
             DenseInstance instance = WekaData.makeInstance(comms);
             try{ model.updateClassifier(instance);}
-            catch (Exception e) {System.out.println("Exception in Hard AI update " + e.toString());}
+            catch (Exception e) {System.out.println("Exception in trainable AI update " + e.toString());}
         }
     }
 
@@ -112,6 +111,5 @@ public class HardAIPlayer extends AIPlayer{
         return instance;
     }
 }
-
 
 

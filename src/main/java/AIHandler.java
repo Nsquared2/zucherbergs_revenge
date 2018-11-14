@@ -49,7 +49,7 @@ public class AIHandler {
         }
 
         return ai_player;
-    };
+    }
 
     /**
      * Initialize a model from saved data or create a new untrained model if none exists
