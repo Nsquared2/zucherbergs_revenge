@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -12,7 +13,7 @@ public class HardAIPlayer extends AIPlayer{
     float comm_thresh = 0.9f;
 
     HardAIPlayer(int id, String name){
-        super(id, name);
+        super(id, name, new ArrayList<>());
     }
 
     /**
@@ -49,6 +50,18 @@ public class HardAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Hard player does not update policy so this function does nothing
-    void update_policy(ArrayList<Integer> ids){}
+    @Override
+    Communication message_action() {
+        return null;
+    }
+
+    @Override
+    ArrayList<Action> round_action() {
+        return null;
+    }
+
+    @Override
+    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results) {
+
+    }
 }

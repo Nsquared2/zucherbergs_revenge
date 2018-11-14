@@ -16,7 +16,9 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 public class MyWebSocketHandler {
 
     private Session currentSess;
-    private Map<Integer, Session> playerMap = new HashMap<Integer, Session>();
+    private Map<Integer, Player> playerMap = new HashMap<>();
+    private Map<Integer, Session> idToSessionMap = new HashMap<>();
+    private List<GameSession> currentGames = new ArrayList<>();
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
@@ -40,7 +42,7 @@ public class MyWebSocketHandler {
         currentSess = session;
         System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
-            for (Session s : playerMap.values()) {
+            for (Session s : idToSessionMap.values()) {
                 s.getRemote().sendString("new player joined: " + id);
             }
             session.getRemote().sendString("Hello Webbrowser");
@@ -56,7 +58,7 @@ public class MyWebSocketHandler {
      */
     private int generatePlayerId(Session session) {
         int id = new Random().nextInt();
-        playerMap.put(id, session);
+        idToSessionMap.put(id, session);
         return id;
     }
 
@@ -94,6 +96,18 @@ public class MyWebSocketHandler {
         }
     }
 
+    private void parseCreateNewSession(String message) {
+        GameSession g = new GameSession();
+        currentGames.add(g);
+    }
+
+    private void parseAddNewPlayer(String playerName, GameSession game, Session socketSess) {
+        int id = generatePlayerId(socketSess);
+        Player p = new Player(playerName, id, socketSess, game);
+        game.addPlayer(p);
+        playerMap.put(id, p);
+    }
+
     /**
      * This method parses action communications from the client, which requires us to update the player
      * state. The player is updated to show that they will be performing a certain action against the given
@@ -101,10 +115,10 @@ public class MyWebSocketHandler {
      */
     private void parseAction(String playerId, String actionType) {
         int id = Integer.parseInt(playerId);
-        //TODO: Update internal player state with new action towards playerId
         try {
             System.out.println(playerId);
             System.out.println(actionType);
+            playerMap.get(id).updateAction(id, ActionType.valueOf(actionType));
             currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,7 +146,7 @@ public class MyWebSocketHandler {
             if (id == 0) {
                 currentSess.getRemote().sendString("message " + "server " + message);
             } else {
-                playerMap.get(id).getRemote().sendString(commType);
+                idToSessionMap.get(id).getRemote().sendString(commType);
             }
         } catch (IOException e) {
             e.printStackTrace();
