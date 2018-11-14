@@ -4,7 +4,9 @@
 
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
+import weka.classifiers.functions.SGD;
 import weka.core.Instances;
+import weka.core.SelectedTag;
 
 import java.util.ArrayList;
 
@@ -14,12 +16,14 @@ import java.util.ArrayList;
  */
 public class AIHandler {
     Instances data_format;
-    String model_path;
 
-    AIHandler(){
+    static String model_path = "./models/";
+    static String medium_model_path = model_path + "medium.model";
+    static String hard_model_path = model_path + "hard.model";
+
+    AIHandler() {
         Instances dataset = WekaData.makeDataset();
-        model_path = "./models/";
-    };
+    }
 
     /**
      * Creates a new AI player based on the input parameters.
@@ -37,12 +41,14 @@ public class AIHandler {
         }
         else if(difficulty.equals("medium")){
             NaiveBayesUpdateable model = new NaiveBayesUpdateable();
-            this.initializeModel(model, this.model_path+"medium.model");
-            ai_player = new MediumAIPlayer(id, name, ids, model);
+            this.initializeModel(model, medium_model_path);
+            ai_player = new TrainableAIPlayer(id, name, ids, model);
         }
         else if(difficulty.equals("hard")){
-            // TODO: Hard ai
-            ai_player = new EasyAIPlayer(id, name, ids);
+            SGD model = new SGD();
+            model.setLossFunction(new SelectedTag(SGD.LOGLOSS, SGD.TAGS_SELECTION));
+            this.initializeModel(model, hard_model_path);
+            ai_player = new TrainableAIPlayer(id, name, ids, model);
         }
         else{
             throw new IllegalArgumentException(difficulty + " is not a valid difficulty string");
