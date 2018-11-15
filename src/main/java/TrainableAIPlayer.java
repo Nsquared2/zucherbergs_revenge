@@ -89,7 +89,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     @Override
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
         int round_id = rcv_comms.size();
-        for(int key: this.models.keySet()){
+        for(int key: this.enemy_ids){
             //Make instance from round data
             C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);

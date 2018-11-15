@@ -1,4 +1,7 @@
+import weka.core.DenseInstance;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -48,6 +51,17 @@ public class EasyAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Easy player does not update policy so this function does nothing
-    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){}
+    //Easy player does not update policy so this function just stores round results
+    @Override
+    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
+        int round_id = rcv_comms.size();
+        for(int key: this.enemy_ids){
+            //Make instance from round data
+            Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
+            DenseInstance instance = WekaData.makeInstance(comms);
+
+            //Update round history
+            this.round_instances.add(instance);
+        }
+    }
 }
