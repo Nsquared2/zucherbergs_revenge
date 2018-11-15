@@ -1,8 +1,6 @@
 import org.eclipse.jetty.websocket.api.Session;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class represents a specific game session between players
@@ -13,14 +11,36 @@ import java.util.Random;
 public class GameSession {
     private int sessionId;
     private String sessionName;
+    private String privateCode;
+    private int roundTime;
+    private int numOfHumans;
+    private int numOfAI;
     private Map<Player, Session> playerMap;
+    private List<AIPlayer> aiPlayers;
+
+    private AIHandler aiHandler;
 
     private int totalRounds;
     private int currentRound;
 
-    public GameSession() {
+    public GameSession(String sessionName, int numOfHumans, int numOfAI) {
+        this.sessionName = sessionName;
+        this.numOfHumans = numOfHumans;
+        this.numOfAI = numOfAI;
         sessionId = new Random().nextInt();
         playerMap = new HashMap<>();
+        aiPlayers = new ArrayList<>(numOfAI);
+
+        //TODO: Add AI players with the AI Handler
+        aiHandler = new AIHandler();
+    }
+
+    public void setRoundTime(int roundTime) {
+        this.roundTime = roundTime;
+    }
+
+    public void setPrivateCode(String code) {
+        this.privateCode = code;
     }
 
     /**
@@ -53,6 +73,10 @@ public class GameSession {
      */
     public boolean isGameOver() {
         return currentRound >= totalRounds;
+    }
+
+    public void endGame() {
+
     }
 
     /**
