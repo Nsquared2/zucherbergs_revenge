@@ -51,4 +51,8 @@ public class Player {
     public void updateAction(int playerId, ActionType action) {
         currentActions.put(playerId, action);
     }
+
+    public void adjustScore(int adjustment) {
+        currentScore += adjustment;
+    }
 }
