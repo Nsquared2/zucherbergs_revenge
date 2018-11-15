@@ -20,8 +20,6 @@ public class Player {
     private int currentScore;
     private GameSession gameSession;
 
-    public Player() {}
-
     public Player (String playerName, int playerId, Session webSocketSession, GameSession gameSession) {
         this.playerName = playerName;
         this.playerId = playerId;
@@ -31,6 +29,10 @@ public class Player {
         this.currentActions = new HashMap<>();
         this.turnConfirmed = false;
         this.currentScore = 0;
+    }
+
+    public void confirmTurn() {
+        turnConfirmed = true;
     }
 
     public boolean isConfirmed() {
@@ -45,6 +47,12 @@ public class Player {
         return playerId;
     }
 
+    /**
+     * This method handles sending a message to the current Player object, by using its stored
+     * WebSocket session
+     * @param comm The Communication that needs to be sent
+     * @param senderId The ID of the player that initiated the message being sent
+     */
     public void sendMessage(CommType comm, int senderId) {
         try {
             webSocketSession.getRemote().sendString("message " + senderId + " " + comm.getMessage());
@@ -53,10 +61,18 @@ public class Player {
         }
     }
 
+    /**
+     * This method updates the action being performed against a specified opponent
+     * @param playerId The ID of the player that will receive the action
+     * @param action The type of action to be performed at the end of the round
+     */
     public void updateAction(int playerId, ActionType action) {
         currentActions.put(playerId, action);
     }
 
+    /**
+     * This method handles adjusting the current score of the player by a given amount
+     */
     public void adjustScore(int adjustment) {
         currentScore += adjustment;
     }

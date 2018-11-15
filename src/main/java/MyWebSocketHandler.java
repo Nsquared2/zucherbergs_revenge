@@ -20,11 +20,17 @@ public class MyWebSocketHandler {
     private Map<Integer, Session> idToSessionMap = new HashMap<>();
     private Map<Integer, GameSession> currentGames = new HashMap<>();
 
+    /**
+     * This is responsible for handling any behavior that needs to occur when a WebSocket conneciton is closed
+     */
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
     }
 
+    /**
+     * This method is responsible for handling errors coming from the WebSocket conneciton itself
+     */
     @OnWebSocketError
     public void onError(Throwable t) {
         System.out.println("Error: " + t.getMessage());
@@ -88,9 +94,26 @@ public class MyWebSocketHandler {
             parseNewGame(strangs.subList(1, strangs.size()-1));
         } else if (strangs.get(0).equals("player")) {
             parseAddPlayer(strangs.get(1), strangs.get(2), strangs.get(3));
+        } else if (strangs.get(0).equals("confirm")) {
+            parseConfirmation(strangs.get(1));
         }
     }
 
+    /**
+     * This method takes the String player id, finds the corresponding Player in the map, and
+     * sets their turn confirmation to true
+     */
+    private void parseConfirmation(String playerId) {
+        int id = Integer.parseInt(playerId);
+
+        Player p = playerMap.get(id);
+        p.confirmTurn();
+    }
+
+    /**
+     * This method is responsible for parsing the new game session parameters, creating a GameSession object,
+     * and adding the game to the Map of current games
+     */
     private void parseNewGame(List<String> input) {
         String name = input.get(1);
         int numHumans = Integer.parseInt(input.get(3));
@@ -101,6 +124,11 @@ public class MyWebSocketHandler {
         //TODO: Add code to handle optional parameters (private code, round limit)
     }
 
+    /**
+     * This method takes in the parameters for adding a player to an existing game session
+     * It creates the new Player object with the given params, adds it to the game session, and
+     * also stores it in the player map.
+     */
     private void parseAddPlayer(String playerName, String playerId, String gameID) {
         int id = Integer.parseInt(playerId);
         int gID = Integer.parseInt(gameID);
