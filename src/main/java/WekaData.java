@@ -1,6 +1,7 @@
 import java.util.*;
 
 import weka.core.*;
+import weka.core.converters.ConverterUtils;
 
 public class WekaData {
     //holds communications counts between 2 players for current rounds
@@ -20,14 +21,22 @@ public class WekaData {
     public static Instances makeDataset(){
         ArrayList<Attribute> atts = new ArrayList<Attribute>();
 
-        for(int i  = 0; i < num_attrs; i++) {
-            Attribute x = new Attribute("x"+ Integer.toString(i), i);
+        for(CommType comm: CommType.values()) {
+            Attribute x = new Attribute(comm.toString());
             atts.add(x);
         }
-        Attribute y = new Attribute("y", ActionType.values().toString());
+
+        List y_vals = new ArrayList(3);
+        for(ActionType action: ActionType.values()){
+            y_vals.add(action.toString());
+        }
+        Attribute y = new Attribute("y", y_vals);
         atts.add(y);
 
         Instances dataset = new Instances("Dataset", atts, 50000);
+
+        //Set which attribute is class label
+        dataset.setClassIndex(dataset.numAttributes() - 1);
 
         return dataset;
     }
@@ -61,4 +70,50 @@ public class WekaData {
     }
 
 
+    /**
+     * Merge two sets of instances by appending row wise. Not to be confused with weka mergeInstances
+     * @param data1 Instances
+     * @param data2 Instances
+     * @return Merged Instances
+     * @throws Exception
+     */
+    public static Instances mergeInstances(Instances data1, Instances data2)
+    {
+        // Check where are the string attributes
+        int asize = data1.numAttributes();
+        boolean strings_pos[] = new boolean[asize];
+        for(int i=0; i<asize; i++)
+        {
+            Attribute att = data1.attribute(i);
+            strings_pos[i] = ((att.type() == Attribute.STRING) ||
+                    (att.type() == Attribute.NOMINAL));
+        }
+
+        // Create a new dataset
+        Instances dest = new Instances(data1);
+        dest.setRelationName(data1.relationName() + "+" + data2.relationName());
+
+        ConverterUtils.DataSource source = new ConverterUtils.DataSource(data2);
+        try {
+            Instances instances = source.getStructure();
+            Instance instance = null;
+            while (source.hasMoreElements(instances)) {
+                instance = source.nextElement(instances);
+                dest.add(instance);
+
+                // Copy string attributes
+                for (int i = 0; i < asize; i++) {
+                    if (strings_pos[i]) {
+                        dest.instance(dest.numInstances() - 1)
+                                .setValue(i, instance.stringValue(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            System.out.println("Instances could not be merged " + e.toString());
+        }
+
+        return dest;
+    }
 }

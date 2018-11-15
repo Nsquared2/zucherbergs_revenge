@@ -51,7 +51,9 @@ public class EasyAIPlayer extends AIPlayer{
         return actions;
     }
 
-    //Easy player does not update policy so this function just stores round results
+    /**
+     *Easy player does not update policy so this function just stores round results
+     */
     @Override
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
         int round_id = rcv_comms.size();

@@ -77,7 +77,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
 
             //TODO: Take into account prior
             int max_action = Util.argmax(distribution);
-            ActionType enemy_action = Util.EnumIndexToValue(ActionType.class, max_action);
+            ActionType enemy_action = Util.enumIndexToValue(ActionType.class, max_action);
             ActionType my_action = this.maximizeValue(enemy_action);
             Action action = new Action(my_action, this.id, enemy);
             actions.add(action);
