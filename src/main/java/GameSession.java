@@ -35,10 +35,20 @@ public class GameSession {
         aiHandler = new AIHandler();
     }
 
+    public int getSessionId() {
+        return sessionId;
+    }
+
+    /**
+     * Sets the optional round time parameter for the game session
+     */
     public void setRoundTime(int roundTime) {
         this.roundTime = roundTime;
     }
 
+    /**
+     * Sets the optional private code for the session
+     */
     public void setPrivateCode(String code) {
         this.privateCode = code;
     }

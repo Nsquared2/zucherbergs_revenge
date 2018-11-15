@@ -18,7 +18,7 @@ public class MyWebSocketHandler {
     private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
     private Map<Integer, Session> idToSessionMap = new HashMap<>();
-    private List<GameSession> currentGames = new ArrayList<>();
+    private Map<Integer, GameSession> currentGames = new HashMap<>();
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
@@ -69,15 +69,6 @@ public class MyWebSocketHandler {
      */
     @OnWebSocketMessage
     public void onMessage(String message) {
-        /*
-        Message (To, Content)
-            Send message to that client with the sender's player id
-        Action (To, ActionType)
-            Update player state
-        Confirmation ()
-            Check if everyone's confirmed -> end round
-         */
-
         System.out.println("Message: " + message);
         parseCommunication(message);
     }
@@ -93,16 +84,30 @@ public class MyWebSocketHandler {
             parseMessage(strangs.get(1), strangs.get(2));
         } else if (strangs.get(0).equals("action")) {
             parseAction(strangs.get(1), strangs.get(2));
+        } else if (strangs.get(0).equals("new_game")) {
+            parseNewGame(strangs.subList(1, strangs.size()-1));
+        } else if (strangs.get(0).equals("player")) {
+            parseAddPlayer(strangs.get(1), strangs.get(2), strangs.get(3));
         }
     }
 
-    private void parseCreateNewSession(String message) {
-        GameSession g = new GameSession();
-        currentGames.add(g);
+    private void parseNewGame(List<String> input) {
+        String name = input.get(1);
+        int numHumans = Integer.parseInt(input.get(3));
+        int numAIs = Integer.parseInt(input.get(5));
+        GameSession g = new GameSession(name, numHumans, numAIs);
+        currentGames.put(g.getSessionId(), g);
+
+        //TODO: Add code to handle optional parameters (private code, round limit)
     }
 
-    private void parseAddNewPlayer(String playerName, GameSession game, Session socketSess) {
-        int id = generatePlayerId(socketSess);
+    private void parseAddPlayer(String playerName, String playerId, String gameID) {
+        int id = Integer.parseInt(playerId);
+        int gID = Integer.parseInt(gameID);
+        Session socketSess = idToSessionMap.get(id);
+
+        GameSession game = currentGames.get(gID);
+
         Player p = new Player(playerName, id, socketSess, game);
         game.addPlayer(p);
         playerMap.put(id, p);

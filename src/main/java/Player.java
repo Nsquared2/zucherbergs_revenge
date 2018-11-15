@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is used to represent a human player in a game session.
+ * This object is responsible for tracking the actions, scores, and IDs of the player
+ * Communication can go through this object, as it maintains a reference to the WebSocket session
+ */
 public class Player {
     private String playerName;
     private int playerId;
