@@ -27,12 +27,12 @@ public class GameSession {
         this.sessionName = sessionName;
         this.numOfHumans = numOfHumans;
         this.numOfAI = numOfAI;
-        sessionId = new Random().nextInt();
+        this.totalRounds = 5;
+        sessionId = new Random().nextInt(Integer.MAX_VALUE);
         playerMap = new HashMap<>();
         aiPlayers = new ArrayList<>(numOfAI);
 
         //TODO: Add AI players with the AI Handler
-        aiHandler = new AIHandler();
     }
 
     public int getSessionId() {
@@ -51,6 +51,10 @@ public class GameSession {
      */
     public void setPrivateCode(String code) {
         this.privateCode = code;
+    }
+
+    public void setTotalRounds(int numRounds) {
+        this.totalRounds = numRounds;
     }
 
     /**
@@ -86,7 +90,7 @@ public class GameSession {
     }
 
     public void endGame() {
-
+        //TODO add code for AI reinforcement learning
     }
 
     /**

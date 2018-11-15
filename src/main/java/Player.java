@@ -58,6 +58,7 @@ public class Player {
             webSocketSession.getRemote().sendString("message " + senderId + " " + comm.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Message send failed");
         }
     }
 
@@ -70,10 +71,18 @@ public class Player {
         currentActions.put(playerId, action);
     }
 
+    public ActionType getActionForId(int playerId) {
+        return currentActions.get(playerId);
+    }
+
     /**
      * This method handles adjusting the current score of the player by a given amount
      */
     public void adjustScore(int adjustment) {
         currentScore += adjustment;
+    }
+
+    public int getCurrentScore() {
+        return this.currentScore;
     }
 }
