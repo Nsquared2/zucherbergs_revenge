@@ -17,7 +17,7 @@ public class MyWebSocketHandler {
 
     private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
-    private Map<Integer, Session> idToSessionMap = new HashMap<>();
+    public Map<Integer, Session> idToSessionMap = new HashMap<>();
     private Map<Integer, GameSession> currentGames = new HashMap<>();
 
     /**
@@ -46,12 +46,10 @@ public class MyWebSocketHandler {
     public void onConnect(Session session) {
         int id = generatePlayerId(session);
         currentSess = session;
-        System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
             for (Session s : idToSessionMap.values()) {
                 s.getRemote().sendString("new player joined: " + id);
             }
-            session.getRemote().sendString("Hello Webbrowser");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -183,6 +181,11 @@ public class MyWebSocketHandler {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Message send failed");
         }
+    }
+
+    public void setCurrentSess(Session s) {
+        this.currentSess = s;
     }
 }
