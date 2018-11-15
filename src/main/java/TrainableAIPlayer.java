@@ -3,8 +3,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
-import weka.classifiers.bayes.NaiveBayesUpdateable;
+import weka.classifiers.UpdateableClassifier;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 
@@ -13,24 +14,24 @@ import weka.core.Instance;
  * This player has deterministic behavior and needs to be trained by the AI handler.
  * Trains using Naive Bayes
  */
-public class MediumAIPlayer extends AIPlayer{
-    NaiveBayesUpdateable base_model;
-    HashMap<Integer, NaiveBayesUpdateable> models;
+public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> extends AIPlayer{
+    C base_model;
+    HashMap<Integer, C> models;
     private float comm_thresh = 0.9f;
     private Random rand = new Random();
 
-    MediumAIPlayer(int id, String name, ArrayList<Integer> ids, NaiveBayesUpdateable model){
+    TrainableAIPlayer(int id, String name, ArrayList<Integer> ids, C model){
         super(id, name, ids);
         this.base_model = model;
-        this.models = new HashMap<Integer, NaiveBayesUpdateable>();
+        this.models = new HashMap<Integer, C>();
 
         // Assign a model for each other player
         for(int enemy_id: this.enemy_ids) {
             try {
-                models.put(enemy_id, (NaiveBayesUpdateable) NaiveBayesUpdateable.makeCopy(this.base_model));
+                models.put(enemy_id, (C) AbstractClassifier.makeCopy(this.base_model));
             }
             catch (Exception e){
-                System.out.println("Exception in MediumAIPlayer model creation " + e);
+                System.out.println("Exception in TrainableAIPlayer model creation " + e);
             }
         }
     }
@@ -38,6 +39,7 @@ public class MediumAIPlayer extends AIPlayer{
     /**
      * Returns a new Communication that will be sent to a random player, and has a random communication type.
      */
+    @Override
     Communication message_action(){
         if(rand.nextFloat() > this.comm_thresh){
             int num_coms = CommType.values().length;
@@ -54,8 +56,9 @@ public class MediumAIPlayer extends AIPlayer{
 
 
     /**
-     * Creates an Action for each of the Player IDs given as input using Naive Bayes model
+     * Creates an Action for each of the Player IDs given as input using C model
      */
+    @Override
     ArrayList<Action> round_action() {
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
@@ -65,11 +68,11 @@ public class MediumAIPlayer extends AIPlayer{
             DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy));
             double[] distribution;
             try {
-                 distribution = this.models.get(enemy_ids).distributionForInstance(instance);
+                distribution = this.models.get(enemy_ids).distributionForInstance(instance);
             }
             catch (Exception e){
-                System.out.println("Error in MediumAIPlayer model evaluation " + e.toString());
-                distribution = new double[3]; //TODO: replace with action_num
+                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
+                distribution = new double[World.num_actions()];
             }
 
             //TODO: Take into account prior
@@ -83,14 +86,21 @@ public class MediumAIPlayer extends AIPlayer{
         return actions;
     }
 
+    @Override
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
         int round_id = rcv_comms.size();
-        for(int key: this.models.keySet()){
-            NaiveBayesUpdateable model = this.models.get(key);
+        for(int key: this.enemy_ids){
+            //Make instance from round data
+            C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
             DenseInstance instance = WekaData.makeInstance(comms);
+
+            //Update round history
+            this.round_instances.add(instance);
+
+            //Update classifier
             try{ model.updateClassifier(instance);}
-            catch (Exception e) {System.out.println("Exception in medium AI update " + e.toString());}
+            catch (Exception e) {System.out.println("Exception in trainable AI update " + e.toString());}
         }
     }
 

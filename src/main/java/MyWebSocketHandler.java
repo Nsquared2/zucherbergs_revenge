@@ -17,14 +17,20 @@ public class MyWebSocketHandler {
 
     private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
-    private Map<Integer, Session> idToSessionMap = new HashMap<>();
-    private List<GameSession> currentGames = new ArrayList<>();
+    public Map<Integer, Session> idToSessionMap = new HashMap<>();
+    private Map<Integer, GameSession> currentGames = new HashMap<>();
 
+    /**
+     * This is responsible for handling any behavior that needs to occur when a WebSocket conneciton is closed
+     */
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
     }
 
+    /**
+     * This method is responsible for handling errors coming from the WebSocket conneciton itself
+     */
     @OnWebSocketError
     public void onError(Throwable t) {
         System.out.println("Error: " + t.getMessage());
@@ -40,12 +46,10 @@ public class MyWebSocketHandler {
     public void onConnect(Session session) {
         int id = generatePlayerId(session);
         currentSess = session;
-        System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
             for (Session s : idToSessionMap.values()) {
                 s.getRemote().sendString("new player joined: " + id);
             }
-            session.getRemote().sendString("Hello Webbrowser");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,15 +73,6 @@ public class MyWebSocketHandler {
      */
     @OnWebSocketMessage
     public void onMessage(String message) {
-        /*
-        Message (To, Content)
-            Send message to that client with the sender's player id
-        Action (To, ActionType)
-            Update player state
-        Confirmation ()
-            Check if everyone's confirmed -> end round
-         */
-
         System.out.println("Message: " + message);
         parseCommunication(message);
     }
@@ -93,16 +88,52 @@ public class MyWebSocketHandler {
             parseMessage(strangs.get(1), strangs.get(2));
         } else if (strangs.get(0).equals("action")) {
             parseAction(strangs.get(1), strangs.get(2));
+        } else if (strangs.get(0).equals("new_game")) {
+            parseNewGame(strangs.subList(1, strangs.size()-1));
+        } else if (strangs.get(0).equals("player")) {
+            parseAddPlayer(strangs.get(1), strangs.get(2), strangs.get(3));
+        } else if (strangs.get(0).equals("confirm")) {
+            parseConfirmation(strangs.get(1));
         }
     }
 
-    private void parseCreateNewSession(String message) {
-        GameSession g = new GameSession();
-        currentGames.add(g);
+    /**
+     * This method takes the String player id, finds the corresponding Player in the map, and
+     * sets their turn confirmation to true
+     */
+    private void parseConfirmation(String playerId) {
+        int id = Integer.parseInt(playerId);
+
+        Player p = playerMap.get(id);
+        p.confirmTurn();
     }
 
-    private void parseAddNewPlayer(String playerName, GameSession game, Session socketSess) {
-        int id = generatePlayerId(socketSess);
+    /**
+     * This method is responsible for parsing the new game session parameters, creating a GameSession object,
+     * and adding the game to the Map of current games
+     */
+    private void parseNewGame(List<String> input) {
+        String name = input.get(1);
+        int numHumans = Integer.parseInt(input.get(3));
+        int numAIs = Integer.parseInt(input.get(5));
+        GameSession g = new GameSession(name, numHumans, numAIs);
+        currentGames.put(g.getSessionId(), g);
+
+        //TODO: Add code to handle optional parameters (private code, round limit)
+    }
+
+    /**
+     * This method takes in the parameters for adding a player to an existing game session
+     * It creates the new Player object with the given params, adds it to the game session, and
+     * also stores it in the player map.
+     */
+    private void parseAddPlayer(String playerName, String playerId, String gameID) {
+        int id = Integer.parseInt(playerId);
+        int gID = Integer.parseInt(gameID);
+        Session socketSess = idToSessionMap.get(id);
+
+        GameSession game = currentGames.get(gID);
+
         Player p = new Player(playerName, id, socketSess, game);
         game.addPlayer(p);
         playerMap.put(id, p);
@@ -150,6 +181,11 @@ public class MyWebSocketHandler {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Message send failed");
         }
+    }
+
+    public void setCurrentSess(Session s) {
+        this.currentSess = s;
     }
 }

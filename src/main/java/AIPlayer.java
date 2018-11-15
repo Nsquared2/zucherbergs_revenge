@@ -4,22 +4,26 @@ import java.util.HashMap;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import weka.core.Instance;
+import weka.core.Instances;
+
 /**
  * This class stores basic information about an AI Player and allows actions/messages to be retrieved from the player.
  * This is an abstract class, so the different AI difficulties will implement the message/action/policy updating in different ways.
  */
 public abstract class AIPlayer extends Object{
-    int id;
-    String name;
-    ArrayList<Integer> enemy_ids;
-    int num_enemies;
-    ArrayList<Multimap<Integer, Communication>> rcv_comms;
-    Multimap<Integer, Communication> map_template;
+    protected int id;
+    private String name;
+    protected ArrayList<Integer> enemy_ids;
+    protected int num_enemies;
+    protected ArrayList<Multimap<Integer, Communication>> rcv_comms;
+    protected Instances round_instances;
+    protected Multimap<Integer, Communication> map_template;
 
     int score;
     ArrayList<ArrayList<String>> action_history;
     Map<Integer, PlayerState> game_state = new HashMap<Integer, PlayerState>();
+
+    AIPlayer(){}
 
     AIPlayer(int id, String name, ArrayList<Integer> ids){
         this.id = id;
@@ -59,6 +63,16 @@ public abstract class AIPlayer extends Object{
     }
 
     /**
+     * Returns name of player
+     */
+    String getName(){return this.name;}
+
+    /**
+     * Returns id of player
+     */
+    int getId(){return this.id;}
+
+    /**
      * Returns the Communication that the AI would like to send.
      */
     abstract Communication message_action();
@@ -70,7 +84,7 @@ public abstract class AIPlayer extends Object{
     abstract ArrayList<Action> round_action();
 
     /**
-     * Updates the AI's current decision making policy.
+     * Updates the AI's current decision making policy and store round_results in round_actions
      */
     abstract void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results);
 }

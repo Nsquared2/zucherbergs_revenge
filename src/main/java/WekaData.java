@@ -4,15 +4,15 @@ import weka.core.*;
 
 public class WekaData {
     //holds communications counts between 2 players for current rounds
-    static int[] comm_vector = new int[6];
+    static int[] comm_vector = new int[World.num_comms()];
 
     //TODO: Don't use this here, use this as a prior stored internally in model
     //holds enemy actions for all previous rounds
-    static int[] action_vector = new int[4];
+    static int[] action_vector = new int[World.num_actions()];
 
     static int num_attrs = 6;
 
-    static HashMap<Object, Integer> index_map = Util.zipToHashMap(Arrays.asList(CommType.values()), Util.range(0, 6));
+    static HashMap<Object, Integer> index_map = Util.zipToHashMap(Arrays.asList(CommType.values()), Util.range(0, World.num_comms()));
 
     /**
      * Create dataset from xml file
