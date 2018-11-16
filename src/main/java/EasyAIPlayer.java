@@ -1,3 +1,4 @@
+import com.google.common.collect.ArrayListMultimap;
 import weka.core.DenseInstance;
 
 import java.util.ArrayList;
@@ -65,5 +66,8 @@ public class EasyAIPlayer extends AIPlayer{
             //Update round history
             this.round_instances.add(instance);
         }
+
+        //Add new layer to rcv comms for next round
+        addMapLayer();
     }
 }

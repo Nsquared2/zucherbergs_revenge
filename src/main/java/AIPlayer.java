@@ -34,6 +34,8 @@ public abstract class AIPlayer extends Object{
 
         this.rcv_comms = new ArrayList<Multimap<Integer, Communication>>();
 
+        addMapLayer();
+
     }
 
     ActionType maximizeValue(ActionType enemy_action){
@@ -52,13 +54,19 @@ public abstract class AIPlayer extends Object{
     }
 
     /**
+     * Adds new round layer to rcv_comms
+     */
+    protected void addMapLayer(){
+        ArrayListMultimap<Integer, Communication> map_layer = ArrayListMultimap.create();
+        for(int id: this.enemy_ids){
+            map_layer.containsKey(id);
+        }
+        this.rcv_comms.add(map_layer);
+    }
+    /**
      * Receives a message from another player for the round and stores it
      */
     void receiveMessage(int round_id, Communication msg){
-        if(round_id+1 > rcv_comms.size()){
-            this.rcv_comms.add(ArrayListMultimap.create(this.map_template));
-        }
-
         this.rcv_comms.get(round_id).put(msg.sender_id, msg);
     }
 
@@ -87,4 +95,8 @@ public abstract class AIPlayer extends Object{
      * Updates the AI's current decision making policy and store round_results in round_actions
      */
     abstract void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results);
+
+    public ArrayList<Multimap<Integer, Communication>> getRcvComms(){
+       return this.rcv_comms;
+    }
 }

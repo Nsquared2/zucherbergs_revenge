@@ -3,6 +3,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.google.common.collect.ArrayListMultimap;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.UpdateableClassifier;
@@ -62,7 +63,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     ArrayList<Action> round_action() {
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
-        int round_id = rcv_comms.size();
+        int round_id = rcv_comms.size()-1;
 
         for(int enemy: this.enemy_ids) {
             DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy));
@@ -88,7 +89,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
 
     @Override
     void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
-        int round_id = rcv_comms.size();
+        int round_id = rcv_comms.size()-1;
         for(int key: this.enemy_ids){
             //Make instance from round data
             C model = this.models.get(key);
@@ -100,8 +101,14 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
 
             //Update classifier
             try{ model.updateClassifier(instance);}
-            catch (Exception e) {System.out.println("Exception in trainable AI update " + e.toString());}
+            catch (Exception e) {
+                System.out.println("Exception in trainable AI update " + e.toString());
+                System.exit(1);
+            }
         }
+
+        //Add new layer to rcv comms for next round
+        addMapLayer();
     }
 
 
