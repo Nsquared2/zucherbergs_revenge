@@ -56,8 +56,8 @@ public class WekaData {
     /**
      * Takes communications for round and returns
      */
-    public static DenseInstance makeInstance(Collection<Communication> comms, Instances eval_data){
-        DenseInstance instance = new DenseInstance(num_attrs);
+    public static SparseInstance makeInstance(Collection<Communication> comms, Instances eval_data){
+        SparseInstance instance = new SparseInstance(num_attrs);
         instance.setDataset(eval_data);
         int[] comm_vector = getCommCounts(comms);
 

@@ -67,10 +67,19 @@ public abstract class AIPlayer extends Object{
         this.rcv_comms.add(map_layer);
     }
     /**
-     * Receives a message from another player for the round and stores it
+     * Receives a message from another player for a specified round and stores it
      */
     void receiveMessage(int round_id, Communication msg){
         this.rcv_comms.get(round_id).put(msg.sender_id, msg);
+    }
+
+    /**
+     * recieves message into most recent round buffer
+     * @param msg message to be stored
+     */
+    void receiveMessage(Communication msg){
+        int last_index = this.rcv_comms.size()-1;
+        this.rcv_comms.get(last_index).put(msg.sender_id, msg);
     }
 
     /**

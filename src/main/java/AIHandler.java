@@ -95,7 +95,7 @@ public class AIHandler {
 
         int save_id = getSaveGameId();
         try {
-            ConverterUtils.DataSink.write(data_file_name_prefix + Integer.toString(save_id) + ".arff", dataset);
+            ConverterUtils.DataSink.write(data_path + data_file_name_prefix + Integer.toString(save_id) + ".arff", dataset);
         }
         catch (Exception e){
             System.out.println("Exception: Game data not saved " + e.toString());
@@ -176,6 +176,7 @@ public class AIHandler {
     static private int getSaveGameId(){
         File data_dir = new File(data_path);
         ArrayList<Integer> game_ids = new ArrayList<Integer>();
+        game_ids.add(0);
         for(File file: data_dir.listFiles()){
             String name = file.getName();
             try {

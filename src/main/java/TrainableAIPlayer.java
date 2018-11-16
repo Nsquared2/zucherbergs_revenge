@@ -9,6 +9,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.UpdateableClassifier;
 import weka.core.DenseInstance;
 import weka.core.Instance;
+import weka.core.SparseInstance;
 
 /**
  * Basic AI player class that corresponds to the Medium difficulty.
@@ -66,7 +67,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
         int round_id = rcv_comms.size()-1;
 
         for(int enemy: this.enemy_ids) {
-            DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy), this.eval_data);
+            SparseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy), this.eval_data);
             double[] distribution;
             try {
                 distribution = this.models.get(enemy).distributionForInstance(instance);
@@ -123,6 +124,10 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
         }
         //instance.setValue(key, comm_counts);
         return instance;
+    }
+
+    public C getBase_model(){
+        return this.base_model;
     }
 }
 
