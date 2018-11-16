@@ -83,17 +83,17 @@ public class MyWebSocketHandler {
      * message will be sent to a different parser.
      */
     private void parseCommunication(String message) {
-        List<String> strangs = Arrays.asList(message.split(" "));
-        if (strangs.get(0).equals("message")) {
-            parseMessage(strangs.get(1), strangs.get(2));
-        } else if (strangs.get(0).equals("action")) {
-            parseAction(strangs.get(1), strangs.get(2));
-        } else if (strangs.get(0).equals("new_game")) {
-            parseNewGame(strangs.subList(1, strangs.size()));
-        } else if (strangs.get(0).equals("player")) {
-            parseAddPlayer(strangs.get(1), strangs.get(2), strangs.get(3));
-        } else if (strangs.get(0).equals("confirm")) {
-            parseConfirmation(strangs.get(1));
+        List<String> strings = Arrays.asList(message.split(" "));
+        if (strings.get(0).equals("message") && strings.size() == 3) {
+            parseMessage(strings.get(1), strings.get(2));
+        } else if (strings.get(0).equals("action") && strings.size() == 3) {
+            parseAction(strings.get(1), strings.get(2));
+        } else if (strings.get(0).equals("new_game")) {
+            parseNewGame(strings.subList(1, strings.size()));
+        } else if (strings.get(0).equals("player") && strings.size() == 4) {
+            parseAddPlayer(strings.get(1), strings.get(2), strings.get(3));
+        } else if (strings.get(0).equals("confirm") && strings.size() == 2) {
+            parseConfirmation(strings.get(1));
         }
     }
 
@@ -113,11 +113,13 @@ public class MyWebSocketHandler {
      * and adding the game to the Map of current games
      */
     private void parseNewGame(List<String> input) {
-        String name = input.get(1);
-        int numHumans = Integer.parseInt(input.get(3));
-        int numAIs = Integer.parseInt(input.get(5));
-        GameSession g = new GameSession(name, numHumans, numAIs);
-        currentGames.put(g.getSessionId(), g);
+        if (input.size() >= 6) {
+            String name = input.get(1);
+            int numHumans = Integer.parseInt(input.get(3));
+            int numAIs = Integer.parseInt(input.get(5));
+            GameSession g = new GameSession(name, numHumans, numAIs);
+            currentGames.put(g.getSessionId(), g);
+        }
 
         //TODO: Add code to handle optional parameters (private code, round limit)
     }
