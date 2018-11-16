@@ -9,6 +9,7 @@ public class ActionTest {
         for (ActionType type : ActionType.values()) {
             Action a = new Action(type);
             assertEquals(type.toString(), a.toString());
+            assertEquals(type, a.getAction());
         }
         Action act = new Action(ActionType.COOPERATE, 1);
         assertEquals(ActionType.COOPERATE.toString(), act.toString());

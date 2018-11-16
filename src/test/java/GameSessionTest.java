@@ -43,5 +43,7 @@ public class GameSessionTest {
         assertEquals(1, game.getPlayerForId(4).getCurrentScore());
 
         assertNull(game.getPlayerForId(1));
+
+        game.endRound();
     }
 }

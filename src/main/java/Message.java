@@ -1,7 +1,7 @@
 /**
  * Interface for all messages to go through server
  */
-public abstract class Message extends Object{
+public abstract class Message {
     int sender_id;
     int reciever_id;
     //TODO: Do we want to reserve id 0 for message sent only to server? Will this ever happen?
