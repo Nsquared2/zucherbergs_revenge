@@ -82,6 +82,8 @@ public class MyWebSocketHandler {
      */
     private void parseCommunication(String message) {
         List<String> strings = Arrays.asList(message.split(" "));
+
+        // Ensures that the message code and number of params are valid
         if (strings.get(0).equals("message") && strings.size() == 3) {
             parseMessage(strings.get(1), strings.get(2));
         } else if (strings.get(0).equals("action") && strings.size() == 3) {
@@ -93,6 +95,8 @@ public class MyWebSocketHandler {
         } else if (strings.get(0).equals("confirm") && strings.size() == 2) {
             parseConfirmation(strings.get(1));
         } else {
+            // Invalid messages result in System.out tracking
+            // TODO: Switch to a logging framework?
             System.out.println("Invalid message from client");
         }
     }
@@ -178,9 +182,9 @@ public class MyWebSocketHandler {
         }
 
         try {
-            // id 0 is the test case
-            if (id == 0) {
-                currentSess.getRemote().sendString("message " + "server " + message);
+            // id 0,1,2,3 are the test cases
+            if (id == 0 || id == 1 || id == 2 || id == 3) {
+                currentSess.getRemote().sendString("message " + playerId + " server " + message);
             } else {
                 idToSessionMap.get(id).getRemote().sendString(commType);
             }
