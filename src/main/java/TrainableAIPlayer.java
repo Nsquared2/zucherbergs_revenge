@@ -66,10 +66,10 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
         int round_id = rcv_comms.size()-1;
 
         for(int enemy: this.enemy_ids) {
-            DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy));
+            DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy), this.eval_data);
             double[] distribution;
             try {
-                distribution = this.models.get(enemy_ids).distributionForInstance(instance);
+                distribution = this.models.get(enemy).distributionForInstance(instance);
             }
             catch (Exception e){
                 System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
@@ -88,19 +88,20 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     }
 
     @Override
-    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
+    void update_policy(HashMap<Integer, ActionType> round_results){
         int round_id = rcv_comms.size()-1;
         for(int key: this.enemy_ids){
             //Make instance from round data
             C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
-            DenseInstance instance = WekaData.makeInstance(comms);
+            ActionType enemy_action = round_results.get(key);
+            DenseInstance instance = WekaData.makeInstance(comms, enemy_action, this.round_instances);
 
             //Update round history
             this.round_instances.add(instance);
-
+            this.round_instances.lastInstance();
             //Update classifier
-            try{ model.updateClassifier(instance);}
+            try{ model.updateClassifier(this.round_instances.lastInstance());}
             catch (Exception e) {
                 System.out.println("Exception in trainable AI update " + e.toString());
                 System.exit(1);

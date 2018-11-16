@@ -56,8 +56,9 @@ public class WekaData {
     /**
      * Takes communications for round and returns
      */
-    public static DenseInstance makeInstance(Collection<Communication> comms){
+    public static DenseInstance makeInstance(Collection<Communication> comms, Instances eval_data){
         DenseInstance instance = new DenseInstance(num_attrs);
+        instance.setDataset(eval_data);
         int[] comm_vector = getCommCounts(comms);
 
         for(int i=0; i < num_attrs; i+=1){
@@ -67,6 +68,26 @@ public class WekaData {
         return instance;
     }
 
+    /**
+     * Takes communications and round actions for round and creates instance
+     * @param comms Communications for round
+     * @param enemy_choice Action of the enemy
+     * @param round_instances Dataset instance will be associated with
+     * @return
+     */
+    public static DenseInstance makeInstance(Collection<Communication> comms, ActionType enemy_choice, Instances round_instances){
+        DenseInstance instance = new DenseInstance(num_attrs+1);
+        instance.setDataset(round_instances);
+        int[] comm_vector = getCommCounts(comms);
+
+        for(int i=0; i < num_attrs; i+=1){
+            instance.setValue(i, comm_vector[i]);
+        }
+
+        instance.setValue(num_attrs, enemy_choice.toString());
+
+        return instance;
+    }
 
     /**
      * Merge two sets of instances by appending row wise. Not to be confused with weka mergeInstances

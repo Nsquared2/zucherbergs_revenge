@@ -17,6 +17,7 @@ public abstract class AIPlayer extends Object{
     protected int num_enemies;
     protected ArrayList<Multimap<Integer, Communication>> rcv_comms;
     protected Instances round_instances;
+    protected Instances eval_data;
     protected Multimap<Integer, Communication> map_template;
 
     int score;
@@ -33,6 +34,8 @@ public abstract class AIPlayer extends Object{
         this.num_enemies = enemy_ids.size();
 
         this.rcv_comms = new ArrayList<Multimap<Integer, Communication>>();
+        this.round_instances = WekaData.makeDataset();
+        this.eval_data = WekaData.makeDataset();
 
         addMapLayer();
 
@@ -94,7 +97,7 @@ public abstract class AIPlayer extends Object{
     /**
      * Updates the AI's current decision making policy and store round_results in round_actions
      */
-    abstract void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results);
+    abstract void update_policy(HashMap<Integer, ActionType> round_results);
 
     public ArrayList<Multimap<Integer, Communication>> getRcvComms(){
        return this.rcv_comms;
