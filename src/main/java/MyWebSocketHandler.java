@@ -143,6 +143,12 @@ public class MyWebSocketHandler {
         Player p = new Player(playerName, id, socketSess, game);
         game.addPlayer(p);
         playerMap.put(id, p);
+
+        try {
+            socketSess.getRemote().sendString("player_id " + id);
+        } catch (IOException e) {
+            System.out.println("Message send failed");
+        }
     }
 
     /**
