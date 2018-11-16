@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SocketHandlerTest {
@@ -53,5 +54,55 @@ public class SocketHandlerTest {
         int id = handler.idToSessionMap.keySet().iterator().next();
         handler.onMessage("message " + id + " request_cooperate");
         assertTrue(bytes.toString().contains("Message send failed"));
+    }
+
+    @Test
+    public void testParseAction() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+        handler.setCurrentSess(new TestSession());
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onConnect(new TestSession());
+
+        int id = handler.idToSessionMap.keySet().iterator().next();
+
+        handler.onMessage("action " + id + " BETRAY");
+    }
+
+    @Test
+    public void testParseNewGame() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+        handler.setCurrentSess(new TestSession());
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage("new_game name testGame humans 2 ai 2");
+
+        GameSession game = handler.currentGames.values().iterator().next();
+
+        assertEquals(game, handler.getGameForId(game.getSessionId()));
+    }
+
+    @Test
+    public void testParseAddPlayer() {
+
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+        handler.setCurrentSess(new TestSession());
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage("new_game name testGame humans 2 ai 2");
+        handler.onConnect(new TestSession());
+
+        GameSession game = handler.currentGames.values().iterator().next();
+        int playerId = handler.idToSessionMap.keySet().iterator().next();
+
+        handler.onMessage("player testPlayer " + playerId + " " + game.getSessionId());
+
+        assertNotNull(handler.getPlayerForId(playerId));
     }
 }
