@@ -18,7 +18,7 @@ public class MyWebSocketHandler {
     private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
     public Map<Integer, Session> idToSessionMap = new HashMap<>();
-    private Map<Integer, GameSession> currentGames = new HashMap<>();
+    public Map<Integer, GameSession> currentGames = new HashMap<>();
 
     /**
      * This is responsible for handling any behavior that needs to occur when a WebSocket conneciton is closed
@@ -89,7 +89,7 @@ public class MyWebSocketHandler {
         } else if (strangs.get(0).equals("action")) {
             parseAction(strangs.get(1), strangs.get(2));
         } else if (strangs.get(0).equals("new_game")) {
-            parseNewGame(strangs.subList(1, strangs.size()-1));
+            parseNewGame(strangs.subList(1, strangs.size()));
         } else if (strangs.get(0).equals("player")) {
             parseAddPlayer(strangs.get(1), strangs.get(2), strangs.get(3));
         } else if (strangs.get(0).equals("confirm")) {
@@ -147,10 +147,10 @@ public class MyWebSocketHandler {
     private void parseAction(String playerId, String actionType) {
         int id = Integer.parseInt(playerId);
         try {
-            System.out.println(playerId);
-            System.out.println(actionType);
-            playerMap.get(id).updateAction(id, ActionType.valueOf(actionType));
-            currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
+            if (playerMap.get(id) != null) {
+                playerMap.get(id).updateAction(id, ActionType.valueOf(actionType));
+                currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -187,5 +187,13 @@ public class MyWebSocketHandler {
 
     public void setCurrentSess(Session s) {
         this.currentSess = s;
+    }
+
+    public Player getPlayerForId(int id) {
+        return playerMap.get(id);
+    }
+
+    public GameSession getGameForId(int id) {
+        return currentGames.get(id);
     }
 }
