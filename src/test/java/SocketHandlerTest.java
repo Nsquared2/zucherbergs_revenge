@@ -36,7 +36,7 @@ public class SocketHandlerTest {
 
         handler.onMessage("TestMessage");
 
-        assertEquals("Message: TestMessage", bytes.toString().trim());
+        assertTrue(bytes.toString().contains("Message: TestMessage"));
     }
 
     @Test
@@ -104,5 +104,18 @@ public class SocketHandlerTest {
         handler.onMessage("player testPlayer " + playerId + " " + game.getSessionId());
 
         assertNotNull(handler.getPlayerForId(playerId));
+    }
+
+    @Test
+    public void testInvalidMessage() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+        handler.setCurrentSess(new TestSession());
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage("nonsense message");
+
+        assertTrue(bytes.toString().contains("Invalid message from client"));
     }
 }

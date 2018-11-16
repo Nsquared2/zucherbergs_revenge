@@ -94,6 +94,8 @@ public class MyWebSocketHandler {
             parseAddPlayer(strings.get(1), strings.get(2), strings.get(3));
         } else if (strings.get(0).equals("confirm") && strings.size() == 2) {
             parseConfirmation(strings.get(1));
+        } else {
+            System.out.println("Invalid message from client");
         }
     }
 
