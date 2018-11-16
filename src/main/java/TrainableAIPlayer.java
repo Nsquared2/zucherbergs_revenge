@@ -73,7 +73,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
                 distribution = this.models.get(enemy).distributionForInstance(instance);
             }
             catch (Exception e){
-                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
+//                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
                 distribution = new double[World.num_actions()];
             }
 

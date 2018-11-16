@@ -41,6 +41,11 @@ public abstract class AIPlayer extends Object{
 
     }
 
+    /**
+     * Return action that maximizes value given predicition of enemy action
+     * @param enemy_action predicted enemy action
+     * @return Action that maximizes value for AI
+     */
     ActionType maximizeValue(ActionType enemy_action){
         //TODO: @Vincent Redo action table
         //TODO: @Mike create maximize_reward and minimize_risk modes
@@ -66,8 +71,11 @@ public abstract class AIPlayer extends Object{
         }
         this.rcv_comms.add(map_layer);
     }
+
     /**
      * Receives a message from another player for a specified round and stores it
+     * @param round_id Id for current round
+     * @param msg Message to be recieved
      */
     void receiveMessage(int round_id, Communication msg){
         this.rcv_comms.get(round_id).put(msg.sender_id, msg);
@@ -108,6 +116,10 @@ public abstract class AIPlayer extends Object{
      */
     abstract void update_policy(HashMap<Integer, ActionType> round_results);
 
+    /**
+     * For Testing. Allows access to rcv_comms
+     * @return reference to rcv_comms
+     */
     public ArrayList<Multimap<Integer, Communication>> getRcvComms(){
        return this.rcv_comms;
     }

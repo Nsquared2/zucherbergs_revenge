@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class AIFunctional {
+    /**
+     * AI players should learn strategies of other players
+     */
     @Test
     public void AI2() {
         ActionType dummy_choice = ActionType.BETRAY;
@@ -17,7 +20,6 @@ public class AIFunctional {
         for (int r = 0; r < 2; r++) {
             ArrayList<Action> ai_actions = ai.round_action();
             ActionType action = ai_actions.get(0).getAction();
-            boolean correct = (action.equals(correct_action));
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_choice);
@@ -29,6 +31,9 @@ public class AIFunctional {
         Assert.assertEquals(correct_action, ai_action);
     }
 
+    /**
+     * Each AI player should send the correct number of round decisions to server at the end of each round
+     */
     @Test
     public void AI3(){
         AIPlayer ai = AIHandler.createAi("medium", 0, "joe", AITestUtil.dummy_ids(2));
@@ -36,7 +41,9 @@ public class AIFunctional {
         Assert.assertEquals(2, ai_actions.size());
     }
 
-    //TODO!
+    /**
+     * AI difficulty rankings should be observable
+     */
     @Test
     public void AI4(){
         ActionType dummy_choice = ActionType.BETRAY;
@@ -120,6 +127,9 @@ public class AIFunctional {
         Assert.assertTrue((hard_accuracy >= med_accuracy));
     }
 
+    /**
+     * Game data should be saved externally in between games
+     */
     @Test
     public void AI6(){
         File folder = new File("./ai_test/dummy_save/");
@@ -156,6 +166,9 @@ public class AIFunctional {
 
     }
 
+    /**
+     * Training AI’s should change starting policies
+     */
     @Test
     public void AI7(){
         AIHandler.setDataPathForTesting("nonexist");
@@ -169,6 +182,25 @@ public class AIFunctional {
         TrainableAIPlayer post_hard_ai = (TrainableAIPlayer) AIHandler.createAi("hard", 0, "hard_post", AITestUtil.dummy_ids(1));
         Assert.assertNotEquals(pre_med_ai.getBase_model(), post_med_ai.getBase_model());
         Assert.assertNotEquals(pre_hard_ai.getBase_model(), post_hard_ai.getBase_model());
+    }
+
+    /**
+     * Easy AI Player should function in a game process
+     */
+    @Test
+    public void AI8(){
+        ActionType dummy_choice = ActionType.BETRAY;
+        AIPlayer ai = AIHandler.createAi("easy", 0, "joe", AITestUtil.dummy_ids(1));
+
+        for (int r = 0; r < 2; r++) {
+            ArrayList<Action> ai_actions = ai.round_action();
+            ActionType action = ai_actions.get(0).getAction();
+
+            HashMap<Integer, ActionType> dummy_results = new HashMap<>();
+            dummy_results.put(1, dummy_choice);
+            ai.update_policy(dummy_results);
+        }
+
     }
 
     private ArrayList<ArrayList<Communication>> genCommSets(int ai_id){

@@ -3,9 +3,9 @@
 @attribute request_cooperate numeric
 @attribute request_betray numeric
 @attribute request_ignore numeric
-@attribute declare_cooperate numeric
-@attribute declare_betray numeric
-@attribute declare_ignore numeric
+@attribute announce_cooperate numeric
+@attribute announce_betray numeric
+@attribute announce_ignore numeric
 @attribute y {cooperate,betray,ignore}
 
 @data

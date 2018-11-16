@@ -57,7 +57,7 @@ public class EasyAIPlayer extends AIPlayer{
      */
     @Override
     void update_policy(HashMap<Integer, ActionType> round_results){
-        int round_id = rcv_comms.size();
+        int round_id = rcv_comms.size()-1;
         for(int key: this.enemy_ids){
             //Make instance from round data
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);

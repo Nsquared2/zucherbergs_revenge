@@ -57,7 +57,7 @@ public class WekaData {
      * Takes communications for round and returns
      */
     public static SparseInstance makeInstance(Collection<Communication> comms, Instances eval_data){
-        SparseInstance instance = new SparseInstance(num_attrs);
+        SparseInstance instance = new SparseInstance(num_attrs+1);
         instance.setDataset(eval_data);
         int[] comm_vector = getCommCounts(comms);
 
@@ -65,6 +65,7 @@ public class WekaData {
             instance.setValue(i, comm_vector[i]);
         }
 
+        instance.setValue(num_attrs, ActionType.IGNORE.toString());
         return instance;
     }
 
