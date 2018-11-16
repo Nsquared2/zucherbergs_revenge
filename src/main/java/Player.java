@@ -85,4 +85,12 @@ public class Player {
     public int getCurrentScore() {
         return this.currentScore;
     }
+
+    public void sendScoreUpdate() {
+        try {
+            webSocketSession.getRemote().sendString("new_score " + currentScore);
+        } catch (IOException e) {
+            System.out.println("Message send failed");
+        }
+    }
 }

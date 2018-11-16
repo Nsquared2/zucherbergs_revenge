@@ -76,9 +76,17 @@ public class GameSession {
             }
         }
         if (isOver) {
+            endRound();
             currentRound++;
         }
         return isOver;
+    }
+
+    public void endRound() {
+        updateScores();
+        for (Player p: playerMap.keySet()) {
+            p.sendScoreUpdate();
+        }
     }
 
     /**
