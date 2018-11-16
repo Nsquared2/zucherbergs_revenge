@@ -47,9 +47,7 @@ public class MyWebSocketHandler {
         int id = generatePlayerId(session);
         currentSess = session;
         try {
-            for (Session s : idToSessionMap.values()) {
-                s.getRemote().sendString("new player joined: " + id);
-            }
+            session.getRemote().sendString("client_id " + id);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -152,7 +150,10 @@ public class MyWebSocketHandler {
         int id = Integer.parseInt(playerId);
         try {
             if (playerMap.get(id) != null) {
-                playerMap.get(id).updateAction(id, ActionType.valueOf(actionType));
+                playerMap.get(id).updateAction(id, ActionType.valueOf(actionType.toUpperCase()));
+                currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
+            }
+            if (id == 1 || id == 2 || id == 3) {
                 currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
             }
         } catch (IOException e) {
