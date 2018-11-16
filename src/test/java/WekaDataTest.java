@@ -21,13 +21,11 @@ public class WekaDataTest {
         dummy_comms.add(new Communication(CommType.REQUEST_COOP, 1, 0));
         dummy_comms.add(new Communication(CommType.REQUEST_BETRAY, 1, 0));
         dummy_comms.add(new Communication(CommType.REQUEST_BETRAY, 1, 0));
+        dummy_comms.add(new Communication(CommType.REQUEST_IGNORE, 1, 0));
         dummy_comms.add(new Communication(CommType.PROMISE_IGNORE, 1, 0));
         dummy_comms.add(new Communication(CommType.PROMISE_COOP, 1, 0));
-        dummy_comms.add(new Communication(CommType.PROMISE_IGNORE, 1, 0));
 
         int[] actual = WekaData.getCommCounts(dummy_comms);
-
-        //TODO: need different equals for array
-        Assert.assertEquals(ans, actual);
+        Assert.assertArrayEquals(ans, actual);
     }
 }

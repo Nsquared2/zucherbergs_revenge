@@ -44,12 +44,10 @@ public class WekaData {
     public static int[] getCommCounts(Collection<Communication> comms){
         int[] comm_vector = new int[6]; //array of zeros
 
-        for(int i=0; i < num_attrs; i+=1){
-            for(Communication comm: comms){
-                //TODO: Verify this with Communication structure
-                int index = index_map.get(comm.getAction());
-                comm_vector[index] += 1;
-            }
+        for(Communication comm: comms){
+            //TODO: Verify this with Communication structure
+            int index = index_map.get(comm.getAction());
+            comm_vector[index] += 1;
         }
 
         return comm_vector;
