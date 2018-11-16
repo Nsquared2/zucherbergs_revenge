@@ -56,12 +56,13 @@ public class EasyAIPlayer extends AIPlayer{
      *Easy player does not update policy so this function just stores round results
      */
     @Override
-    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
+    void update_policy(HashMap<Integer, ActionType> round_results){
         int round_id = rcv_comms.size();
         for(int key: this.enemy_ids){
             //Make instance from round data
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
-            DenseInstance instance = WekaData.makeInstance(comms);
+            ActionType enemy_action = round_results.get(key);
+            DenseInstance instance = WekaData.makeInstance(comms, enemy_action, this.round_instances);
 
             //Update round history
             this.round_instances.add(instance);
