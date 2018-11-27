@@ -39,6 +39,8 @@ public class EasyAIPlayer extends AIPlayer{
      * Creates a random Action for each of the Player IDs given as input.
      */
     ArrayList<Action> round_action() {
+        currentRoundActions.clear();
+
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
 
@@ -47,6 +49,7 @@ public class EasyAIPlayer extends AIPlayer{
 
             Action action = new Action(action_type, this.id, reciever);
             actions.add(action);
+            currentRoundActions.put(reciever, action_type);
         }
 
         return actions;

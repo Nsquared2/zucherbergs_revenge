@@ -24,6 +24,8 @@ public abstract class AIPlayer extends Object{
     ArrayList<ArrayList<String>> action_history;
     Map<Integer, PlayerState> game_state = new HashMap<Integer, PlayerState>();
 
+    Map<Integer, ActionType> currentRoundActions = new HashMap<>();
+
     AIPlayer(){}
 
     AIPlayer(int id, String name, ArrayList<Integer> ids){
@@ -122,5 +124,13 @@ public abstract class AIPlayer extends Object{
      */
     public ArrayList<Multimap<Integer, Communication>> getRcvComms(){
        return this.rcv_comms;
+    }
+
+    public void addEnemy(int id) {
+        enemy_ids.add(id);
+    }
+
+    public ActionType getActionForId(int id) {
+        return currentRoundActions.get(id);
     }
 }

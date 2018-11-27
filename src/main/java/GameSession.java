@@ -33,6 +33,11 @@ public class GameSession {
         aiPlayers = new ArrayList<>(numOfAI);
 
         //TODO: Add AI players with the AI Handler
+        for (int i = 0; i < numOfAI; i++) {
+            Random r = new Random();
+            int ai_id = r.nextInt();
+            aiPlayers.add(AIHandler.createAi("easy", ai_id, "AI " + i, new ArrayList<>()));
+        }
     }
 
     public int getSessionId() {
@@ -62,6 +67,9 @@ public class GameSession {
      */
     public void addPlayer(Player p) {
         playerMap.put(p, p.getWebSocketSession());
+        for (AIPlayer ai : aiPlayers) {
+            ai.addEnemy(p.getPlayerId());
+        }
     }
 
     /**
@@ -70,11 +78,16 @@ public class GameSession {
      */
     public boolean isRoundOver() {
         boolean isOver = true;
+        if (playerMap.keySet().size() < numOfHumans) {
+            return false;
+        }
+
         for (Player p : playerMap.keySet()) {
             if (!p.isConfirmed()) {
                 isOver = false;
             }
         }
+
         if (isOver) {
             endRound();
             currentRound++;
@@ -83,6 +96,10 @@ public class GameSession {
     }
 
     public void endRound() {
+        for (AIPlayer ai : aiPlayers) {
+            ai.round_action();
+        }
+
         updateScores();
         for (Player p: playerMap.keySet()) {
             p.sendScoreUpdate();
@@ -126,14 +143,50 @@ public class GameSession {
     /**
      * This method is responsible for updating the score of a specific player, based on their pairs of
      * moves against their opponents.
-     *
-     * TODO: Currently, we just increment the score by one, need to add actual scoring logic
      */
     public void updatePlayerScore(Player p) {
         for (Player opponent : playerMap.keySet()) {
             if (!opponent.equals(p)) {
-                p.adjustScore(1);
+                p.adjustScore(calculateScore(
+                        p.getActionForId(opponent.getPlayerId()),
+                        opponent.getActionForId(p.getPlayerId())));
             }
+        }
+
+        for (AIPlayer ai : aiPlayers) {
+            p.adjustScore(calculateScore(
+                    p.getActionForId(ai.getId()),
+                    ai.getActionForId(p.getPlayerId())
+            ));
+        }
+    }
+
+
+    public int calculateScore(ActionType myAction, ActionType theirAction) {
+        switch(myAction) {
+            case COOPERATE:
+                switch(theirAction) {
+                    case COOPERATE:
+                        return 1;
+                    case BETRAY:
+                        return 0;
+                    case IGNORE:
+                        return 1;
+                }
+            case BETRAY:
+                switch(theirAction) {
+                    case COOPERATE:
+                        return 2;
+                    case BETRAY:
+                        return 0;
+                    case IGNORE:
+                        return 1;
+                }
+            case IGNORE:
+                return 1;
+
+            default:
+                    return 1;
         }
     }
 }
