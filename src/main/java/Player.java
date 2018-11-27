@@ -33,6 +33,7 @@ public class Player {
 
     public void confirmTurn() {
         turnConfirmed = true;
+        gameSession.isRoundOver();
     }
 
     public boolean isConfirmed() {
