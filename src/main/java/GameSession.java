@@ -1,5 +1,6 @@
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -69,6 +70,13 @@ public class GameSession {
         playerMap.put(p, p.getWebSocketSession());
         for (AIPlayer ai : aiPlayers) {
             ai.addEnemy(p.getPlayerId());
+        }
+        for (Session s : playerMap.values()) {
+            try {
+                s.getRemote().sendString("player_joined " + p.getPlayerId());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -159,6 +167,12 @@ public class GameSession {
                     ai.getActionForId(p.getPlayerId())
             ));
         }
+
+        try {
+            playerMap.get(p).getRemote().sendString("new_score " + p.getCurrentScore());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -188,5 +202,21 @@ public class GameSession {
             default:
                     return 1;
         }
+    }
+
+    public void setId(int id) {
+        this.sessionId = id;
+    }
+
+    public String getName() {
+        return sessionName;
+    }
+
+    public int getMaxOcc() {
+        return numOfHumans;
+    }
+
+    public int getCurrentOcc() {
+        return playerMap.size();
     }
 }

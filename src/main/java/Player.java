@@ -94,4 +94,8 @@ public class Player {
             System.out.println("Message send failed");
         }
     }
+
+    public void setGameSession(GameSession game) {
+        this.gameSession = game;
+    }
 }

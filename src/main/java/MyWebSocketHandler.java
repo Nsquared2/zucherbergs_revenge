@@ -17,7 +17,6 @@ public class MyWebSocketHandler {
 
     private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
-    public Map<Integer, Session> idToSessionMap = new HashMap<>();
     public Map<Integer, GameSession> currentGames = new HashMap<>();
 
     /**
@@ -44,23 +43,18 @@ public class MyWebSocketHandler {
      */
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        int id = generatePlayerId(session);
-        currentSess = session;
-        try {
-            session.getRemote().sendString("client_id " + id);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        addTestGame();
     }
 
     /**
      * Generates a new random Player ID, and stores the session with the ID as the key.
-     * @param session
      * @return
      */
-    private int generatePlayerId(Session session) {
+    private int generatePlayerId() {
         int id = new Random().nextInt();
-        idToSessionMap.put(id, session);
+        while (playerMap.keySet().contains(id)) {
+            id = new Random().nextInt();
+        }
         return id;
     }
 
@@ -70,9 +64,16 @@ public class MyWebSocketHandler {
      * @param message
      */
     @OnWebSocketMessage
-    public void onMessage(String message) {
+    public void onMessage(Session session, String message) {
+        if (session != null) {
+            System.out.println("Session is valid");
+        }
         System.out.println("Message: " + message);
-        parseCommunication(message);
+        parseCommunication(message, session);
+    }
+
+    public void onMessage(String message) {
+
     }
 
     /**
@@ -80,7 +81,7 @@ public class MyWebSocketHandler {
      * Depending on the first word, which denotes the type of communication, the rest of the
      * message will be sent to a different parser.
      */
-    private void parseCommunication(String message) {
+    private void parseCommunication(String message, Session session) {
         List<String> strings = Arrays.asList(message.split(" "));
 
         // Ensures that the message code and number of params are valid
@@ -90,14 +91,31 @@ public class MyWebSocketHandler {
             parseAction(strings.get(1), strings.get(2));
         } else if (strings.get(0).equals("new_game")) {
             parseNewGame(strings.subList(1, strings.size()));
-        } else if (strings.get(0).equals("player") && strings.size() == 4) {
-            parseAddPlayer(strings.get(1), strings.get(2), strings.get(3));
+        } else if (strings.get(0).equals("joingame")) {
+            parseAddPlayer(strings.get(1), strings.get(2));
         } else if (strings.get(0).equals("confirm") && strings.size() == 2) {
             parseConfirmation(strings.get(1));
+        } else if (strings.get(0).equals("newplayer")) {
+            parseNewPlayer(strings.get(1), session );
+        } else if (strings.get(0).equals("game_info")) {
+            sendGameInfo(session);
         } else {
+            // "game_info" -> send info about every game (game_id, game_name, max_occupancy, current_occupancy, num_rounds), in separate messages
+            // "updateplayer" -> assign new Session to player and map, no response necessary
             // Invalid messages result in System.out tracking
             // TODO: Switch to a logging framework?
             System.out.println("Invalid message from client");
+        }
+    }
+
+    private void sendGameInfo(Session session) {
+        for (GameSession game : currentGames.values()) {
+            try {
+                session.getRemote().sendString(game.getSessionId() + ", "
+                        + game.getName() + ", " + game.getMaxOcc() + ", " + game.getCurrentOcc());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -117,15 +135,25 @@ public class MyWebSocketHandler {
      * and adding the game to the Map of current games
      */
     private void parseNewGame(List<String> input) {
-        if (input.size() >= 6) {
-            String name = input.get(1);
-            int numHumans = Integer.parseInt(input.get(3));
-            int numAIs = Integer.parseInt(input.get(5));
-            GameSession g = new GameSession(name, numHumans, numAIs);
-            currentGames.put(g.getSessionId(), g);
-        }
+        String name = input.get(0);
+        int numHumans = Integer.parseInt(input.get(1));
+        int numAIs = Integer.parseInt(input.get(2));
+        GameSession g = new GameSession(name, numHumans, numAIs);
+        currentGames.put(g.getSessionId(), g);
 
+        // time <time> code <code>
         //TODO: Add code to handle optional parameters (private code, round limit)
+    }
+
+    private void parseNewPlayer(String playerName, Session sess) {
+        int id = generatePlayerId();
+        Player p = new Player(playerName, id, sess, null);
+        playerMap.put(id, p);
+        try {
+            sess.getRemote().sendString("newplayer, " + id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -133,19 +161,27 @@ public class MyWebSocketHandler {
      * It creates the new Player object with the given params, adds it to the game session, and
      * also stores it in the player map.
      */
-    private void parseAddPlayer(String playerName, String playerId, String gameID) {
+    private void parseAddPlayer(String playerId, String gameID) {
         int id = Integer.parseInt(playerId);
         int gID = Integer.parseInt(gameID);
-        Session socketSess = idToSessionMap.get(id);
 
+        Player p = playerMap.get(id);
         GameSession game = currentGames.get(gID);
 
-        Player p = new Player(playerName, id, socketSess, game);
+        if (game == null) {
+            try {
+                p.getWebSocketSession().getRemote().sendString("game_join_failed");
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         game.addPlayer(p);
-        playerMap.put(id, p);
+        p.setGameSession(game);
 
         try {
-            socketSess.getRemote().sendString("player_id " + id);
+            p.getWebSocketSession().getRemote().sendString("game_joined " + gID);
         } catch (IOException e) {
             System.out.println("Message send failed");
         }
@@ -192,7 +228,7 @@ public class MyWebSocketHandler {
             if (id == 0 || id == 1 || id == 2 || id == 3) {
                 currentSess.getRemote().sendString("message " + playerId + " server " + message);
             } else {
-                idToSessionMap.get(id).getRemote().sendString(commType);
+                playerMap.get(id).getWebSocketSession().getRemote().sendString("message server " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,5 +246,11 @@ public class MyWebSocketHandler {
 
     public GameSession getGameForId(int id) {
         return currentGames.get(id);
+    }
+
+    public void addTestGame() {
+        GameSession game = new GameSession("Test Game", 3, 3);
+        game.setId(1);
+        currentGames.put(1, game);
     }
 }
