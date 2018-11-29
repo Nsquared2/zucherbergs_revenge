@@ -15,7 +15,6 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 @WebSocket
 public class MyWebSocketHandler {
 
-    private Session currentSess;
     private Map<Integer, Player> playerMap = new HashMap<>();
     public Map<Integer, GameSession> currentGames = new HashMap<>();
 
@@ -88,7 +87,7 @@ public class MyWebSocketHandler {
         if (strings.get(0).equals("message") && strings.size() == 3) {
             parseMessage(strings.get(1), strings.get(2));
         } else if (strings.get(0).equals("action") && strings.size() == 3) {
-            parseAction(strings.get(1), strings.get(2));
+            parseAction(strings.get(1), strings.get(2), session);
         } else if (strings.get(0).equals("new_game")) {
             parseNewGame(strings.subList(1, strings.size()));
         } else if (strings.get(0).equals("joingame")) {
@@ -99,12 +98,21 @@ public class MyWebSocketHandler {
             parseNewPlayer(strings.get(1), session );
         } else if (strings.get(0).equals("game_info")) {
             sendGameInfo(session);
+        } else if (strings.get(0).equals("updateplayer")) {
+            updatePlayerSession(strings.get(1), session);
         } else {
-            // "game_info" -> send info about every game (game_id, game_name, max_occupancy, current_occupancy, num_rounds), in separate messages
-            // "updateplayer" -> assign new Session to player and map, no response necessary
+
+
             // Invalid messages result in System.out tracking
             // TODO: Switch to a logging framework?
             System.out.println("Invalid message from client");
+        }
+    }
+
+    private void updatePlayerSession(String s, Session session) {
+        int playerId = Integer.parseInt(s);
+        if (playerMap.get(playerId) != null) {
+            playerMap.get(playerId).setWebSocketSession(session);
         }
     }
 
@@ -192,15 +200,18 @@ public class MyWebSocketHandler {
      * state. The player is updated to show that they will be performing a certain action against the given
      * player ID, and a response is sent to the client to confirm the change in action.
      */
-    private void parseAction(String playerId, String actionType) {
+    private void parseAction(String playerId, String actionType, Session session) {
         int id = Integer.parseInt(playerId);
         try {
-            if (playerMap.get(id) != null) {
-                playerMap.get(id).updateAction(id, ActionType.valueOf(actionType.toUpperCase()));
-                currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
+            Player p = null;
+            for (Player player : playerMap.values()) {
+                if (player.getWebSocketSession().equals(session)) {
+                    p = player;
+                }
             }
-            if (id == 1 || id == 2 || id == 3) {
-                currentSess.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
+            if (p != null) {
+                p.updateAction(id, ActionType.valueOf(actionType.toUpperCase()));
+                session.getRemote().sendString("updated move for player: " + playerId + " to be: " + actionType);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -224,20 +235,14 @@ public class MyWebSocketHandler {
         }
 
         try {
-            // id 0,1,2,3 are the test cases
-            if (id == 0 || id == 1 || id == 2 || id == 3) {
-                currentSess.getRemote().sendString("message " + playerId + " server " + message);
-            } else {
-                playerMap.get(id).getWebSocketSession().getRemote().sendString("message server " + message);
+            Player p = playerMap.get(id);
+            if (p != null) {
+                p.getWebSocketSession().getRemote().sendString("message server " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Message send failed");
         }
-    }
-
-    public void setCurrentSess(Session s) {
-        this.currentSess = s;
     }
 
     public Player getPlayerForId(int id) {

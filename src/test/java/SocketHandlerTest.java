@@ -34,7 +34,7 @@ public class SocketHandlerTest {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
 
-        handler.onMessage("TestMessage");
+        handler.onMessage(new TestSession(), "TestMessage");
 
         assertTrue(bytes.toString().contains("Message: TestMessage"));
     }
@@ -42,7 +42,6 @@ public class SocketHandlerTest {
     @Test
     public void testParseMessage() {
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
@@ -59,7 +58,6 @@ public class SocketHandlerTest {
     @Test
     public void testParseAction() {
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
@@ -74,13 +72,13 @@ public class SocketHandlerTest {
     @Test
     public void testParseNewGame() {
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
 
-        handler.onMessage("new_game name testGame humans 2 ai 2");
+        handler.onMessage(new TestSession(), "new_game testGame 2 2");
 
+        assertEquals(1, handler.currentGames.size());
         GameSession game = handler.currentGames.values().iterator().next();
 
         assertEquals(game, handler.getGameForId(game.getSessionId()));
@@ -90,7 +88,6 @@ public class SocketHandlerTest {
     public void testParseAddPlayer() {
 
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
@@ -109,12 +106,11 @@ public class SocketHandlerTest {
     @Test
     public void testInvalidMessage() {
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
 
-        handler.onMessage("nonsense message");
+        handler.onMessage(new TestSession(), "nonsense message");
 
         assertTrue(bytes.toString().contains("Invalid message from client"));
     }

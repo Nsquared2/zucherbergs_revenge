@@ -44,6 +44,6 @@ public class PlayerTest {
 
         p.sendMessage(CommType.PROMISE_BETRAY, 4);
 
-        assertTrue(bytes.toString().contains("Message send failed"));
+        assertTrue(bytes.toString().contains(CommType.PROMISE_BETRAY.getMessage()));
     }
 }

@@ -36,6 +36,10 @@ public class Player {
         gameSession.isRoundOver();
     }
 
+    public void resetTurnConfirmation() {
+        turnConfirmed = false;
+    }
+
     public boolean isConfirmed() {
         return turnConfirmed;
     }
@@ -97,5 +101,9 @@ public class Player {
 
     public void setGameSession(GameSession game) {
         this.gameSession = game;
+    }
+
+    public void setWebSocketSession(Session sess) {
+        this.webSocketSession = sess;
     }
 }

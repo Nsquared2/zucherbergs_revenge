@@ -2,6 +2,7 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a specific game session between players
@@ -132,6 +133,7 @@ public class GameSession {
     public void updateScores() {
         for (Player p : playerMap.keySet()) {
             updatePlayerScore(p);
+            p.resetTurnConfirmation();
         }
     }
 
@@ -155,9 +157,15 @@ public class GameSession {
     public void updatePlayerScore(Player p) {
         for (Player opponent : playerMap.keySet()) {
             if (!opponent.equals(p)) {
-                p.adjustScore(calculateScore(
-                        p.getActionForId(opponent.getPlayerId()),
-                        opponent.getActionForId(p.getPlayerId())));
+                ActionType myAction = p.getActionForId(opponent.getPlayerId());
+                ActionType theirAction = opponent.getActionForId(p.getPlayerId());
+                if (myAction == null) {
+                    myAction = ActionType.IGNORE;
+                }
+                if (theirAction == null) {
+                    theirAction = ActionType.IGNORE;
+                }
+                p.adjustScore(calculateScore(myAction, theirAction));
             }
         }
 
@@ -168,11 +176,7 @@ public class GameSession {
             ));
         }
 
-        try {
-            playerMap.get(p).getRemote().sendString("new_score " + p.getCurrentScore());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 
@@ -218,5 +222,9 @@ public class GameSession {
 
     public int getCurrentOcc() {
         return playerMap.size();
+    }
+
+    public List<Integer> getIdsForAI() {
+        return aiPlayers.stream().map(AIPlayer::getId).collect(Collectors.toList());
     }
 }
