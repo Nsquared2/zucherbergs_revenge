@@ -1,3 +1,30 @@
+// establish connection to server
+var ws = new WebSocket("ws://172.20.47.177:8090/");
+
+// writes a cookie
+function setCookie(cname, cvalue, minutes) {
+    var d = new Date();
+    d.setTime(d.getTime() + (minutes * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+// reads a cookie
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 // represents other players in the game
 var Player = function(id, name){
   this.id = id;
@@ -18,10 +45,35 @@ Player.prototype.html = function(){
           '</div></div>';
 }
 
+// HTML for all messages of a player
+Player.prototype.allMessages = function(){
+  out = "";
+  for(i in this.messages){
+    out += this.messages[i].html();
+  }
+  return out;
+}
+
+// messages (to display in chat)
+var Message = function(from, text){
+  this.from = from;
+  this.text = text;
+}
+
+// produces HTML to display in chat
+Message.prototype.html = function(){
+  if(this.from == "server"){
+    frum = "server";
+  }else{
+    frum = "them";
+  }
+  return '<div class="message-container"><div class="message '+frum+'">'+this.text+'</div></div>';
+}
+
 // holds information about the player using the client
-var You = function(id){
-  this.id = id;
-  this.name = name;
+var You = function(){
+  this.id = getCookie("playerid");
+  this.name = getCookie("playername");
   this.score = 0;
   this.place = "";
 }
@@ -58,7 +110,7 @@ Game.prototype.getPlayer = function(id){
 
 // displays info in dash for the currently selected player
 Game.prototype.updateCurrentPlayer = function(){
-  messages = document.getElementById("messages-pane");
+  document.getElementById("messages-pane").innerHTML = this.currentPlayer.allMessages();
   
   document.getElementById("current-player").innerHTML = "to: "+this.currentPlayer.name;
   document.getElementById("request-select").value = this.currentPlayer.requesting;
@@ -116,36 +168,45 @@ function appendMessage(text, who){
 }
 
 // TEST DATA
-me = new You(1337);
-game = new Game("GAMENAME", "4", false, me);
+me = new You();
 
-player = new Player(20,"Paul");
-game.addPlayer(player);
-
-player = new Player(11,"Stebe");
-game.addPlayer(player);
-
-player = new Player(0,"Sarah");
-game.addPlayer(player);
-
-// establish connection to server
-var ws = new WebSocket("ws://172.20.34.59:8090/");
+game = new Game("GAMENAME", "100", false, me);
 
 // when a message is recieved from the server, parse it and decide how to update the interface/game information
 ws.onmessage = function (evt) {
   console.log("IN : " + evt.data);
   message = evt.data.split(" ");
   switch(message[0]){
+    case "game_info":
+      game.name = message[1];
+      game.rounds = parseInt(message[2]);
+      game.round = parseInt(message[3]);
+      game.time_limit = parseInt(message[3]);
+      break;
+    case "player":
+      // info about a player in this game
+      game.addPlayer(new Player(message[1],message[2]));
+      break;
     case "message":
       // the message is a message to display in the chat
       if(message[1] == "server"){
-        appendMessage(message.slice(2,message.length).join(" "),"server");
+        game.players[0].messages.push(new Message("server",message.slice(2,message.length).join(" ")));
+      }else if(parseInt(message[1]) == game.you.id){
+        game.getPlayer(parseInt(messages[2])).messages.push(new Message(message[1],message.slice(3,message.length).join(" ")));
       }else{
-        appendMessage(message.slice(2,message.length).join(" "),"them");
+        game.getPlayer(parseInt(message[1])).messages.push(new Message(message[2],message.slice(3,message.length).join(" ")));
+        
+        console.log(game.currentPlayer.messages);
+        document.getElementById("messages-pane").innerHTML = game.currentPlayer.allMessages();
+        document.getElementById("messages-pane").scrollTop = document.getElementById("messages-pane").scrollHeight;
       }
       break;
   }
 };
+
+ws.onopen = function() {
+  ws.send("update_player "+me.id);
+}
 
 // in case of network or server issues:
 ws.onclose = function() {
