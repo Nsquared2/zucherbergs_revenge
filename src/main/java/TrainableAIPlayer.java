@@ -3,11 +3,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.google.common.collect.ArrayListMultimap;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.UpdateableClassifier;
 import weka.core.DenseInstance;
 import weka.core.Instance;
+import weka.core.SparseInstance;
 
 /**
  * Basic AI player class that corresponds to the Medium difficulty.
@@ -62,22 +64,22 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     ArrayList<Action> round_action() {
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
-        int round_id = rcv_comms.size();
+        int round_id = rcv_comms.size()-1;
 
         for(int enemy: this.enemy_ids) {
-            DenseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy));
+            SparseInstance instance = WekaData.makeInstance(rcv_comms.get(round_id).get(enemy), this.eval_data);
             double[] distribution;
             try {
-                distribution = this.models.get(enemy_ids).distributionForInstance(instance);
+                distribution = this.models.get(enemy).distributionForInstance(instance);
             }
             catch (Exception e){
-                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
+//                System.out.println("Error in TrainableAIPlayer model evaluation " + e.toString());
                 distribution = new double[World.num_actions()];
             }
 
             //TODO: Take into account prior
             int max_action = Util.argmax(distribution);
-            ActionType enemy_action = Util.EnumIndexToValue(ActionType.class, max_action);
+            ActionType enemy_action = Util.enumIndexToValue(ActionType.class, max_action);
             ActionType my_action = this.maximizeValue(enemy_action);
             Action action = new Action(my_action, this.id, enemy);
             actions.add(action);
@@ -87,21 +89,28 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     }
 
     @Override
-    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
-        int round_id = rcv_comms.size();
+    void update_policy(HashMap<Integer, ActionType> round_results){
+        int round_id = rcv_comms.size()-1;
         for(int key: this.enemy_ids){
             //Make instance from round data
             C model = this.models.get(key);
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
-            DenseInstance instance = WekaData.makeInstance(comms);
+            ActionType enemy_action = round_results.get(key);
+            DenseInstance instance = WekaData.makeInstance(comms, enemy_action, this.round_instances);
 
             //Update round history
             this.round_instances.add(instance);
-
+            this.round_instances.lastInstance();
             //Update classifier
-            try{ model.updateClassifier(instance);}
-            catch (Exception e) {System.out.println("Exception in trainable AI update " + e.toString());}
+            try{ model.updateClassifier(this.round_instances.lastInstance());}
+            catch (Exception e) {
+                System.out.println("Exception in trainable AI update " + e.toString());
+                System.exit(1);
+            }
         }
+
+        //Add new layer to rcv comms for next round
+        addMapLayer();
     }
 
 
@@ -115,6 +124,10 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
         }
         //instance.setValue(key, comm_counts);
         return instance;
+    }
+
+    public C getBase_model(){
+        return this.base_model;
     }
 }
 

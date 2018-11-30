@@ -1,3 +1,4 @@
+import com.google.common.collect.ArrayListMultimap;
 import weka.core.DenseInstance;
 
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class EasyAIPlayer extends AIPlayer{
      * Creates a random Action for each of the Player IDs given as input.
      */
     ArrayList<Action> round_action() {
+        currentRoundActions.clear();
+
         int num_actions = ActionType.values().length;
         ArrayList<Action> actions = new ArrayList<Action>(0);
 
@@ -46,22 +49,29 @@ public class EasyAIPlayer extends AIPlayer{
 
             Action action = new Action(action_type, this.id, reciever);
             actions.add(action);
+            currentRoundActions.put(reciever, action_type);
         }
 
         return actions;
     }
 
-    //Easy player does not update policy so this function just stores round results
+    /**
+     *Easy player does not update policy so this function just stores round results
+     */
     @Override
-    void update_policy(ArrayList<HashMap<Integer, ActionType>> round_results){
-        int round_id = rcv_comms.size();
+    void update_policy(HashMap<Integer, ActionType> round_results){
+        int round_id = rcv_comms.size()-1;
         for(int key: this.enemy_ids){
             //Make instance from round data
             Collection<Communication> comms = this.rcv_comms.get(round_id).get(key);
-            DenseInstance instance = WekaData.makeInstance(comms);
+            ActionType enemy_action = round_results.get(key);
+            DenseInstance instance = WekaData.makeInstance(comms, enemy_action, this.round_instances);
 
             //Update round history
             this.round_instances.add(instance);
         }
+
+        //Add new layer to rcv comms for next round
+        addMapLayer();
     }
 }

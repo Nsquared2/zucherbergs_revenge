@@ -17,14 +17,23 @@ public class GameSessionTest {
 
     @Test
     public void testRoundAndGameEnds() {
-        GameSession game = new GameSession("Test", 2, 2);
-        game.setTotalRounds(1);
+        GameSession game = new GameSession("Test", 1, 1);
+        Player p = new Player("Bob", 1, new TestSession(), game);
+        game.setTotalRounds(3);
 
-        assertTrue(game.isRoundOver());
-        assertTrue(game.isGameOver());
+        game.addPlayer(p);
+
+        p.updateAction(game.getIdsForAI().get(0), ActionType.COOPERATE);
+        p.confirmTurn();
+
+        assertFalse(game.isRoundOver());
+        assertFalse(game.isGameOver());
 
         game = new GameSession("Test", 2, 2);
-        game.addPlayer(new Player("Bob", 3, new TestSession(), game));
+        Player frank = new Player("Frank", 3, new TestSession(), game);
+        game.addPlayer(frank);
+
+        frank.confirmTurn();
 
         assertFalse(game.isRoundOver());
         assertFalse(game.isGameOver());
@@ -34,14 +43,22 @@ public class GameSessionTest {
 
     @Test
     public void testUpdatingScoresAndGettingPlayers() {
-        GameSession game = new GameSession("Test", 2, 2);
-        game.addPlayer(new Player("Bob", 3, new TestSession(), game));
-        game.addPlayer(new Player("Frank", 4, new TestSession(), game));
+        GameSession game = new GameSession("Test", 3, 0);
+        Player bob = new Player("Bob", 3, new TestSession(), game);
+        Player frank = new Player("Frank", 4, new TestSession(), game);
+        Player sally = new Player("Sally", 5, new TestSession(), game);
+        game.addPlayer(bob);
+        game.addPlayer(frank);
+        game.addPlayer(sally);
 
-        game.updateScores();
-        assertEquals(1, game.getPlayerForId(3).getCurrentScore());
-        assertEquals(1, game.getPlayerForId(4).getCurrentScore());
+        bob.updateAction(4, ActionType.COOPERATE);
+        frank.updateAction(3, ActionType.COOPERATE);
 
-        assertNull(game.getPlayerForId(1));
+        bob.confirmTurn();
+        frank.confirmTurn();
+        sally.confirmTurn();
+
+        assertEquals(2, bob.getCurrentScore());
+        assertEquals(2, frank.getCurrentScore());
     }
 }

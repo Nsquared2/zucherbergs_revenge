@@ -1,6 +1,10 @@
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesUpdateable;
 import weka.classifiers.functions.SGD;
+import weka.classifiers.meta.MultiClassClassifier;
+import weka.classifiers.meta.MultiClassClassifierUpdateable;
+import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
 import weka.core.converters.ArffLoader;
@@ -25,10 +29,6 @@ public class AIHandler {
     static String data_path = "./data/";
     static String data_file_name_prefix = "game";
 
-    AIHandler() {
-        Instances dataset = WekaData.makeDataset();
-    }
-
     // ************ Game Start Interface **********************
     /**
      * Creates a new AI player based on the input parameters.
@@ -38,7 +38,7 @@ public class AIHandler {
      * @param ids The list of ids of all game players
      * @return The new AI player, with the given ID and name, which will perform to the selected difficulty level
      */
-    public AIPlayer createAi(String difficulty, int id, String name, ArrayList<Integer> ids){
+    static public AIPlayer createAi(String difficulty, int id, String name, ArrayList<Integer> ids){
         AIPlayer ai_player;
 
         if(difficulty.equals("easy")){
@@ -46,13 +46,13 @@ public class AIHandler {
         }
         else if(difficulty.equals("medium")){
             NaiveBayesUpdateable model = new NaiveBayesUpdateable();
-            this.initializeModel(model, medium_model_path);
+            initializeModel(model, medium_model_path);
             ai_player = new TrainableAIPlayer(id, name, ids, model);
         }
         else if(difficulty.equals("hard")){
-            SGD model = new SGD();
-            model.setLossFunction(new SelectedTag(SGD.LOGLOSS, SGD.TAGS_SELECTION));
-            this.initializeModel(model, hard_model_path);
+            //Create multi class classifier consisting of logistic regression models
+            MultiClassClassifierUpdateable model = initHardBaseModel();
+            initializeModel(model, hard_model_path);
             ai_player = new TrainableAIPlayer(id, name, ids, model);
         }
         else{
@@ -68,7 +68,7 @@ public class AIHandler {
      * This method handles the training procedures for the medium and hard policies.
      * The easy difficulty does not require training, as the behavior is deterministic.
      */
-    void trainBasePolicies(){
+    public static void trainBasePolicies(){
         //easy policy is stochastic so never trained
 
         //medium policy training procedure
@@ -77,8 +77,7 @@ public class AIHandler {
         saveBaseModel(medium_model_path, medium_policy_model);
 
         //hard policy training procedure
-        SGD hard_policy_model = new SGD();
-        hard_policy_model.setLossFunction(new SelectedTag(SGD.LOGLOSS, SGD.TAGS_SELECTION));
+        MultiClassClassifierUpdateable hard_policy_model = initHardBaseModel();
         trainClassifierWithGameData(hard_policy_model);
         saveBaseModel(hard_model_path, hard_policy_model);
     };
@@ -88,16 +87,15 @@ public class AIHandler {
      * Adds the round observations of all the AI players to the database for future base policy training
      * @param players Arraylist of all AI players that participated in the game
      */
-    void saveAiPlayerObservations(ArrayList<AIPlayer> players) {
-        Instances dataset = WekaData.makeDataset();
+    public static void saveAiPlayerObservations(ArrayList<AIPlayer> players) { Instances dataset = WekaData.makeDataset();
         for (AIPlayer player : players) {
             //TODO: Append to ARFF file
-            dataset = Instances.mergeInstances(dataset, player.round_instances);
+            dataset = WekaData.mergeInstances(dataset, player.round_instances);
         }
 
         int save_id = getSaveGameId();
         try {
-            ConverterUtils.DataSink.write(data_file_name_prefix + Integer.toString(save_id) + ".arff", dataset);
+            ConverterUtils.DataSink.write(data_path + data_file_name_prefix + Integer.toString(save_id) + ".arff", dataset);
         }
         catch (Exception e){
             System.out.println("Exception: Game data not saved " + e.toString());
@@ -111,34 +109,39 @@ public class AIHandler {
      * @param path filepath to model
      * @param <C> Classifier type
      */
-    private <C extends Classifier> void initializeModel(C model, String path){
+    static private <C extends Classifier> void initializeModel(C model, String path){
         // check if model exists, if so load
         try {
             model = (C) weka.core.SerializationHelper.read(path);
         }
         catch (Exception e){
             //TODO: catch specific exception}
-            try{ model.buildClassifier(this.data_format);}
-            catch (Exception f){System.out.println("Exception in building classifier " + f.toString());}
+            try{
+                Instances dataset = WekaData.makeDataset();
+                model.buildClassifier(dataset);
+            }
+            catch (Exception f){
+                System.out.println("Exception in building classifier " + f.toString());
+            }
         }
     }
 
-    private <C extends Classifier> void trainClassifierWithGameData(C model){
+    static private <C extends Classifier> void trainClassifierWithGameData(C model){
         File data_dir = new File(data_path);
         ArrayList<Integer> game_ids = new ArrayList<Integer>();
 
         Instances dataset = WekaData.makeDataset();
         for(File file: data_dir.listFiles()) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(file.getName()));
+                BufferedReader reader = new BufferedReader(new FileReader(data_path + file.getName()));
                 ArffLoader.ArffReader arff = new ArffLoader.ArffReader(reader);
                 Instances game_data = arff.getData();
                 game_data.setClassIndex(game_data.numAttributes() - 1);
                 //TODO: Avoid loading everything into RAM?
-                dataset = Instances.mergeInstances(dataset, game_data);
+                dataset = WekaData.mergeInstances(dataset, game_data);
             }
             catch (Exception e){
-                System.out.println("Error: File " + file.getName() + " not used by training.");
+                System.out.println("Error: File " + file.getName() + " not used by training: " + e.toString());
             }
         }
 
@@ -157,7 +160,7 @@ public class AIHandler {
      * @param model the trained model object itself
      * @param <C> Classifier type
      */
-    private <C extends Classifier> void saveBaseModel(String path, C model){
+    static private <C extends Classifier> void saveBaseModel(String path, C model){
         try {
             weka.core.SerializationHelper.write(path, model);
         }
@@ -170,9 +173,10 @@ public class AIHandler {
      * Used to get id for game being currently saved
      * @return (id of last saved game) + 1
      */
-    private int getSaveGameId(){
+    static private int getSaveGameId(){
         File data_dir = new File(data_path);
         ArrayList<Integer> game_ids = new ArrayList<Integer>();
+        game_ids.add(0);
         for(File file: data_dir.listFiles()){
             String name = file.getName();
             try {
@@ -183,5 +187,38 @@ public class AIHandler {
         }
 
         return Collections.max(game_ids)+1;
+    }
+
+    /**
+     * Used to create model for hard policy since it is non trivial
+     * @return untrained model for hard base policy
+     */
+    static private MultiClassClassifierUpdateable initHardBaseModel(){
+        SGD sub_model = new SGD();
+        sub_model.setLossFunction(new SelectedTag(SGD.LOGLOSS, SGD.TAGS_SELECTION));
+
+        MultiClassClassifierUpdateable model = new MultiClassClassifierUpdateable();
+        model.setMethod(new SelectedTag(MultiClassClassifierUpdateable.METHOD_1_AGAINST_ALL, MultiClassClassifierUpdateable.TAGS_METHOD));
+        model.setClassifier(sub_model);
+        return model;
+    }
+    // ************ Access **********************
+
+    /**
+     * Sets data_path. Should only be used for testing
+     * @param path new path to data folder
+     */
+    static public void setDataPathForTesting(String path){
+       data_path = path;
+    }
+
+    /**
+     * Sets model_path. Should only be used for testing
+     * @param path new path to data folder
+     */
+    static public void setModelPathForTesting(String path){
+        model_path = path;
+        medium_model_path = model_path + "medium.model";
+        hard_model_path = model_path + "hard.model";
     }
 }

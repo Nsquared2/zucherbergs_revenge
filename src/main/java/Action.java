@@ -25,4 +25,6 @@ public class Action extends Message{
      * Delegates the toString call to the ActionType enum to get a meaningful desc. of the action
      */
     public String toString() {return action.toString();}
+
+    public ActionType getAction(){return this.action;}
 }

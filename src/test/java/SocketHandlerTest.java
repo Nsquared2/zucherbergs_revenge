@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SocketHandlerTest {
@@ -33,15 +34,14 @@ public class SocketHandlerTest {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
 
-        handler.onMessage("TestMessage");
+        handler.onMessage(new TestSession(), "TestMessage");
 
-        assertEquals("Message: TestMessage", bytes.toString().trim());
+        assertTrue(bytes.toString().contains("Message: TestMessage"));
     }
 
     @Test
     public void testParseMessage() {
         MyWebSocketHandler handler = new MyWebSocketHandler();
-        handler.setCurrentSess(new TestSession());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
@@ -50,8 +50,68 @@ public class SocketHandlerTest {
 
         handler.onConnect(new TestSession());
 
-        int id = handler.idToSessionMap.keySet().iterator().next();
-        handler.onMessage("message " + id + " request_cooperate");
-        assertTrue(bytes.toString().contains("Message send failed"));
+//        int id = handler.idToSessionMap.keySet().iterator().next();
+//        handler.onMessage("message " + id + " request_cooperate");
+//        assertTrue(bytes.toString().contains("Message send failed"));
+    }
+
+    @Test
+    public void testParseAction() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onConnect(new TestSession());
+
+//        int id = handler.idToSessionMap.keySet().iterator().next();
+//
+//        handler.onMessage("action " + id + " BETRAY");
+    }
+
+    @Test
+    public void testParseNewGame() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage(new TestSession(), "new_game testGame 2 2");
+
+        assertEquals(1, handler.currentGames.size());
+        GameSession game = handler.currentGames.values().iterator().next();
+
+        assertEquals(game, handler.getGameForId(game.getSessionId()));
+    }
+
+    @Test
+    public void testParseAddPlayer() {
+
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage("new_game name testGame humans 2 ai 2");
+        handler.onConnect(new TestSession());
+
+        GameSession game = handler.currentGames.values().iterator().next();
+//        int playerId = handler.idToSessionMap.keySet().iterator().next();
+//
+//        handler.onMessage("player testPlayer " + playerId + " " + game.getSessionId());
+//
+//        assertNotNull(handler.getPlayerForId(playerId));
+    }
+
+    @Test
+    public void testInvalidMessage() {
+        MyWebSocketHandler handler = new MyWebSocketHandler();
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(bytes));
+
+        handler.onMessage(new TestSession(), "nonsense message");
+
+        assertTrue(bytes.toString().contains("Invalid message from client"));
     }
 }

@@ -86,7 +86,7 @@ public class TestSession implements Session {
 
             @Override
             public void sendString(String s) throws IOException {
-                throw new IOException();
+                System.out.println(s);
             }
 
             @Override

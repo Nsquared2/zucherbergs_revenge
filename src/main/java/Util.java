@@ -20,18 +20,18 @@ public class Util {
 
     public static List<Integer> range(int min, int max) {
         List<Integer> list = newLinkedList();
-        for (int i = min; i <= max; i++) {
+        for (int i = min; i < max; i++) {
             list.add(i);
         }
 
         return list;
     }
 
-    public static int argmax(Iterable<Double> arr){
+    public static <C extends Iterable<Double>> int argmax(C arr){
         Iterator<Double> iter = arr.iterator();
         double max = iter.next();
         int max_id = 0;
-        int i = 0;
+        int i = 1;
 
         while(iter.hasNext()) {
             if(iter.next() > max)
@@ -54,7 +54,7 @@ public class Util {
         return max_id;
     }
 
-    public static  <E extends Enum<E>> E EnumIndexToValue(Class<E> my_enum, int index){
+    public static  <E extends Enum<E>> E enumIndexToValue(Class<E> my_enum, int index){
         List<E> vals = Arrays.asList(my_enum.getEnumConstants());
         return vals.get(index);
     }

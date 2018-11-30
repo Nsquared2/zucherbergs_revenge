@@ -33,6 +33,11 @@ public class Player {
 
     public void confirmTurn() {
         turnConfirmed = true;
+        gameSession.isRoundOver();
+    }
+
+    public void resetTurnConfirmation() {
+        turnConfirmed = false;
     }
 
     public boolean isConfirmed() {
@@ -84,5 +89,29 @@ public class Player {
 
     public int getCurrentScore() {
         return this.currentScore;
+    }
+
+    public void sendScoreUpdate() {
+        try {
+            webSocketSession.getRemote().sendString("new_score " + currentScore);
+        } catch (IOException e) {
+            System.out.println("Message send failed");
+        }
+    }
+
+    public void setGameSession(GameSession game) {
+        this.gameSession = game;
+    }
+
+    public GameSession getGameSession() {
+        return this.gameSession;
+    }
+
+    public void setWebSocketSession(Session sess) {
+        this.webSocketSession = sess;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }

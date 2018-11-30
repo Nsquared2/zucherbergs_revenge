@@ -1,6 +1,8 @@
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a specific game session between players
@@ -28,11 +30,16 @@ public class GameSession {
         this.numOfHumans = numOfHumans;
         this.numOfAI = numOfAI;
         this.totalRounds = 5;
-        sessionId = new Random().nextInt(Integer.MAX_VALUE);
+        sessionId = new Random().nextInt();
         playerMap = new HashMap<>();
         aiPlayers = new ArrayList<>(numOfAI);
 
         //TODO: Add AI players with the AI Handler
+        for (int i = 0; i < numOfAI; i++) {
+            Random r = new Random();
+            int ai_id = r.nextInt();
+            aiPlayers.add(AIHandler.createAi("easy", ai_id, "AI_" + i, new ArrayList<>()));
+        }
     }
 
     public int getSessionId() {
@@ -62,6 +69,16 @@ public class GameSession {
      */
     public void addPlayer(Player p) {
         playerMap.put(p, p.getWebSocketSession());
+        for (AIPlayer ai : aiPlayers) {
+            ai.addEnemy(p.getPlayerId());
+        }
+        for (Session s : playerMap.values()) {
+            try {
+                s.getRemote().sendString("player_joined " + p.getPlayerId());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -70,15 +87,32 @@ public class GameSession {
      */
     public boolean isRoundOver() {
         boolean isOver = true;
+        if (playerMap.keySet().size() < numOfHumans) {
+            return false;
+        }
+
         for (Player p : playerMap.keySet()) {
             if (!p.isConfirmed()) {
                 isOver = false;
             }
         }
+
         if (isOver) {
+            endRound();
             currentRound++;
         }
         return isOver;
+    }
+
+    public void endRound() {
+        for (AIPlayer ai : aiPlayers) {
+            ai.round_action();
+        }
+
+        updateScores();
+        for (Player p: playerMap.keySet()) {
+            p.sendScoreUpdate();
+        }
     }
 
     /**
@@ -99,6 +133,7 @@ public class GameSession {
     public void updateScores() {
         for (Player p : playerMap.keySet()) {
             updatePlayerScore(p);
+            p.resetTurnConfirmation();
         }
     }
 
@@ -118,13 +153,110 @@ public class GameSession {
     /**
      * This method is responsible for updating the score of a specific player, based on their pairs of
      * moves against their opponents.
-     *
-     * TODO: Currently, we just increment the score by one, need to add actual scoring logic
      */
     public void updatePlayerScore(Player p) {
         for (Player opponent : playerMap.keySet()) {
             if (!opponent.equals(p)) {
-                p.adjustScore(1);
+                ActionType myAction = p.getActionForId(opponent.getPlayerId());
+                ActionType theirAction = opponent.getActionForId(p.getPlayerId());
+                if (myAction == null) {
+                    myAction = ActionType.IGNORE;
+                }
+                if (theirAction == null) {
+                    theirAction = ActionType.IGNORE;
+                }
+                p.adjustScore(calculateScore(myAction, theirAction));
+            }
+        }
+
+        for (AIPlayer ai : aiPlayers) {
+            p.adjustScore(calculateScore(
+                    p.getActionForId(ai.getId()),
+                    ai.getActionForId(p.getPlayerId())
+            ));
+        }
+
+
+    }
+
+
+    public int calculateScore(ActionType myAction, ActionType theirAction) {
+        switch(myAction) {
+            case COOPERATE:
+                switch(theirAction) {
+                    case COOPERATE:
+                        return 1;
+                    case BETRAY:
+                        return 0;
+                    case IGNORE:
+                        return 1;
+                }
+            case BETRAY:
+                switch(theirAction) {
+                    case COOPERATE:
+                        return 2;
+                    case BETRAY:
+                        return 0;
+                    case IGNORE:
+                        return 1;
+                }
+            case IGNORE:
+                return 1;
+
+            default:
+                    return 1;
+        }
+    }
+
+    public void setId(int id) {
+        this.sessionId = id;
+    }
+
+    public String getName() {
+        return sessionName;
+    }
+
+    public int getMaxOcc() {
+        return numOfHumans + numOfAI;
+    }
+
+    public int getCurrentOcc() {
+        return playerMap.size();
+    }
+
+    public List<Integer> getIdsForAI() {
+        return aiPlayers.stream().map(AIPlayer::getId).collect(Collectors.toList());
+    }
+
+    public int getNumRounds() {
+        return totalRounds;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void sendPlayerInfoFor(Player p) {
+        System.out.println("Sending player info");
+
+        for (Player opp : playerMap.keySet()) {
+            if (!opp.equals(p)) {
+                String playerInfo = "player " + opp.getPlayerId() + " " + opp.getPlayerName();
+                try {
+                    p.getWebSocketSession().getRemote().sendString(playerInfo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        for (AIPlayer ai : aiPlayers) {
+            String playerInfo = "player " + ai.getId() + " " + ai.getName();
+            System.out.println(playerInfo);
+            try {
+                p.getWebSocketSession().getRemote().sendString(playerInfo);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
