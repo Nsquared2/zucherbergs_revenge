@@ -70,14 +70,16 @@ ws.onmessage = function (evt) {
   }
 };
 
-// declare new player
-
 setCookie("playername",prompt("Player Name"),10);
-ws.send("newplayer "+getCookie("playername"));
+
+ws.onopen = function(){
+  // declare new player
+  ws.send("newplayer "+getCookie("playername"));
 
 
-// get the public games
-ws.send("game_info");
+  // get the public games
+  ws.send("game_info");
+}
 
 // some fake data to show
 game = new Game(1, "test my game boi", 80, 17, 30);

@@ -58,12 +58,15 @@ Player.prototype.allMessages = function(){
 var Message = function(from, text){
   this.from = from;
   this.text = text;
+  console.log(from);
 }
 
 // produces HTML to display in chat
 Message.prototype.html = function(){
   if(this.from == "server"){
     frum = "server";
+  }else if(this.from == "you"){
+    frum = "you"
   }else{
     frum = "them";
   }
@@ -191,15 +194,16 @@ ws.onmessage = function (evt) {
       // the message is a message to display in the chat
       if(message[1] == "server"){
         game.players[0].messages.push(new Message("server",message.slice(2,message.length).join(" ")));
-      }else if(parseInt(message[1]) == game.you.id){
-        game.getPlayer(parseInt(messages[2])).messages.push(new Message(message[1],message.slice(3,message.length).join(" ")));
+      }else if(parseInt(message[2]) == game.you.id){
+        game.getPlayer(parseInt(message[1])).messages.push(new Message("you",message.slice(3,message.length).join(" ")));
       }else{
-        game.getPlayer(parseInt(message[1])).messages.push(new Message(message[2],message.slice(3,message.length).join(" ")));
+        game.getPlayer(parseInt(message[2])).messages.push(new Message(parseInt(message[2]),message.slice(3,message.length).join(" ")));
         
         console.log(game.currentPlayer.messages);
         document.getElementById("messages-pane").innerHTML = game.currentPlayer.allMessages();
         document.getElementById("messages-pane").scrollTop = document.getElementById("messages-pane").scrollHeight;
       }
+      game.updateCurrentPlayer();
       break;
   }
 };
