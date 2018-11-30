@@ -30,7 +30,7 @@ public class GameSession {
         this.numOfHumans = numOfHumans;
         this.numOfAI = numOfAI;
         this.totalRounds = 5;
-        sessionId = new Random().nextInt(Integer.MAX_VALUE);
+        sessionId = new Random().nextInt();
         playerMap = new HashMap<>();
         aiPlayers = new ArrayList<>(numOfAI);
 
@@ -38,7 +38,7 @@ public class GameSession {
         for (int i = 0; i < numOfAI; i++) {
             Random r = new Random();
             int ai_id = r.nextInt();
-            aiPlayers.add(AIHandler.createAi("easy", ai_id, "AI " + i, new ArrayList<>()));
+            aiPlayers.add(AIHandler.createAi("easy", ai_id, "AI_" + i, new ArrayList<>()));
         }
     }
 
@@ -217,7 +217,7 @@ public class GameSession {
     }
 
     public int getMaxOcc() {
-        return numOfHumans;
+        return numOfHumans + numOfAI;
     }
 
     public int getCurrentOcc() {
@@ -226,5 +226,38 @@ public class GameSession {
 
     public List<Integer> getIdsForAI() {
         return aiPlayers.stream().map(AIPlayer::getId).collect(Collectors.toList());
+    }
+
+    public int getNumRounds() {
+        return totalRounds;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void sendPlayerInfoFor(Player p) {
+        System.out.println("Sending player info");
+
+        for (Player opp : playerMap.keySet()) {
+            if (!opp.equals(p)) {
+                String playerInfo = "player " + opp.getPlayerId() + " " + opp.getPlayerName();
+                try {
+                    p.getWebSocketSession().getRemote().sendString(playerInfo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        for (AIPlayer ai : aiPlayers) {
+            String playerInfo = "player " + ai.getId() + " " + ai.getName();
+            System.out.println(playerInfo);
+            try {
+                p.getWebSocketSession().getRemote().sendString(playerInfo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

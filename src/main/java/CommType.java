@@ -6,12 +6,12 @@
  * message text that will be displayed to the user receiving the communication.
  */
 public enum CommType{
-    REQUEST_COOP("request_cooperate", "You have been requested to select cooperate"),
-    REQUEST_BETRAY("request_betray", "You have been requested to select betray"),
-    REQUEST_IGNORE("request_ignore", "You have been requested to select ignore"),
-    PROMISE_COOP("announce_cooperate", "You have received a promise for cooperation"),
-    PROMISE_BETRAY("announce_betray", "You have received a promise for betrayal"),
-    PROMISE_IGNORE("announce_ignore", "You have received a promise for ignore");
+    REQUEST_COOP("request_cooperate", "Request to  cooperate"),
+    REQUEST_BETRAY("request_betray", "Request to betray"),
+    REQUEST_IGNORE("request_ignore", "Request to ignore"),
+    PROMISE_COOP("announce_cooperate", "Promise for cooperation"),
+    PROMISE_BETRAY("announce_betray", "Promise for betrayal"),
+    PROMISE_IGNORE("announce_ignore", "Promise for ignore");
 
     private String name;
     private String message;

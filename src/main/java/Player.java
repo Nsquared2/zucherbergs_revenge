@@ -103,7 +103,15 @@ public class Player {
         this.gameSession = game;
     }
 
+    public GameSession getGameSession() {
+        return this.gameSession;
+    }
+
     public void setWebSocketSession(Session sess) {
         this.webSocketSession = sess;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }
