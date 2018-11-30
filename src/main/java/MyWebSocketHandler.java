@@ -263,8 +263,8 @@ public class MyWebSocketHandler {
 
         try {
             Player p = playerMap.get(id);
-            String socketMessage = "message " + sender.getPlayerId() +
-                    " " + id + " " + message;
+            String socketMessage = "message " + id +
+                    " " + sender.getPlayerId() + " " + message;
             sender.getWebSocketSession().getRemote().sendString(socketMessage);
             if (p != null) {
                 p.getWebSocketSession().getRemote().sendString(socketMessage);
