@@ -39,7 +39,18 @@ Game.prototype.show = function(){
 }
 
 
-var ws = new WebSocket("ws://172.20.47.177:8090/");
+setCookie("playername",prompt("Player Name"),10);
+
+var ws = new WebSocket("ws://172.20.42.193:8090/");
+
+ws.onopen = function(){
+  // declare new player
+  ws.send("newplayer "+getCookie("playername"));
+
+
+  // get the public games
+  ws.send("game_info");
+}
 
 // when a message is recieved from the server, parse it and decide how to update the interface/game information
 
@@ -64,22 +75,10 @@ ws.onmessage = function (evt) {
       window.location.href = "../frontend/game.html";
       break;
     case "game_join_failed":
-      alert("gmae join failed");
-      // refresh games
+      ws.send("game_info");
       break;
   }
 };
-
-setCookie("playername",prompt("Player Name"),10);
-
-ws.onopen = function(){
-  // declare new player
-  ws.send("newplayer "+getCookie("playername"));
-
-
-  // get the public games
-  ws.send("game_info");
-}
 
 // some fake data to show
 game = new Game(1, "test my game boi", 80, 17, 30);

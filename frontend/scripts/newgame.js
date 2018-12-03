@@ -1,5 +1,5 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.47.177:8090/");
+var ws = new WebSocket("ws://172.20.42.193:8090/");
 
 document.getElementById("timeLimitCheck").addEventListener("change",function(){
   document.getElementById("timeLimit").disabled = !this.checked;

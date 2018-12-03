@@ -1,5 +1,5 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.47.177:8090/");
+var ws = new WebSocket("ws://172.20.42.193:8090/");
 
 // writes a cookie
 function setCookie(cname, cvalue, minutes) {
@@ -58,7 +58,6 @@ Player.prototype.allMessages = function(){
 var Message = function(from, text){
   this.from = from;
   this.text = text;
-  console.log(from);
 }
 
 // produces HTML to display in chat
@@ -162,6 +161,29 @@ Game.prototype.changeAction = function(player_id, action){
   console.log("OUT: "+message);
 }
 
+Game.prototype.update_info = function(){
+  document.getElementById("score").innerHTML = "Score: "+this.you.score+"<br>"+this.you.place;
+  document.getElementById("round").innerHTML = "Round "+this.round+"/"+this.rounds;
+}
+
+Game.prototype.final_scores = function(message){
+  message = message.slice(1,message.length);
+  text = "FINAL SCORES:<br>"
+  for(i = 0; i < message.length-1; i+=2){
+    text += message[i]+" "+message[i+1]+"<br>";
+  }
+
+  text += "<button onclick='window.location.href = \"../frontend/index.html\";'>Return to Index</button>";
+
+  message = new Message("server",text);
+
+  for(i in this.players){
+    this.players[i].messages.push(message);
+  }
+
+  this.updateCurrentPlayer();
+}
+
 // adds a message to the current chat view
 // text: the content of the message
 // who: either "them", "server", "you"
@@ -173,7 +195,7 @@ function appendMessage(text, who){
 // TEST DATA
 me = new You();
 
-game = new Game("GAMENAME", "100", false, me);
+game = new Game("GAMENAME", 100, false, me);
 
 // when a message is recieved from the server, parse it and decide how to update the interface/game information
 ws.onmessage = function (evt) {
@@ -181,10 +203,10 @@ ws.onmessage = function (evt) {
   message = evt.data.split(" ");
   switch(message[0]){
     case "game_info":
-      game.name = message[1];
-      game.rounds = parseInt(message[2]);
-      game.round = parseInt(message[3]);
-      game.time_limit = parseInt(message[3]);
+      game.name = message[2];
+      game.rounds = parseInt(message[4]);
+      game.round = parseInt(message[5]);
+      game.time_limit = parseInt(message[5]);
       break;
     case "player":
       // info about a player in this game
@@ -204,6 +226,17 @@ ws.onmessage = function (evt) {
         document.getElementById("messages-pane").scrollTop = document.getElementById("messages-pane").scrollHeight;
       }
       game.updateCurrentPlayer();
+      break;
+    case "new_score":
+      game.you.score = parseInt(message[1]);
+      game.update_info();
+      break;
+    case "round_number":
+      game.round = parseInt(message[1]);
+      game.update_info();
+      break;
+    case "final_scores":
+      game.final_scores(message);
       break;
   }
 };
@@ -241,6 +274,10 @@ document.getElementById("action-select").addEventListener("change",function(){
   game.changeAction(game.currentPlayer.id,game.currentPlayer.action);
 });
 
+document.getElementById("confirm").addEventListener("click", function(){
+  ws.send("confirm");
+  console.log("OUT: confirm");
+});
 
 
 
