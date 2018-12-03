@@ -22,7 +22,15 @@ public class MyWebSocketHandler {
      * This is responsible for handling any behavior that needs to occur when a WebSocket conneciton is closed
      */
     @OnWebSocketClose
-    public void onClose(int statusCode, String reason) {
+    public void onClose(Session session, int statusCode, String reason) {
+        for (Player p : playerMap.values()) {
+            if (p.getWebSocketSession().equals(session)) {
+                GameSession game = p.getGameSession();
+                if (game != null) {
+                    //game.removePlayer(p);
+                }
+            }
+        }
         System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
     }
 
@@ -89,8 +97,8 @@ public class MyWebSocketHandler {
             parseNewGame(strings.subList(1, strings.size()));
         } else if (strings.get(0).equals("joingame")) {
             parseAddPlayer(strings.get(1), strings.get(2));
-        } else if (strings.get(0).equals("confirm") && strings.size() == 2) {
-            parseConfirmation(strings.get(1));
+        } else if (strings.get(0).equals("confirm")) {
+            parseConfirmation(session);
         } else if (strings.get(0).equals("newplayer")) {
             parseNewPlayer(strings.get(1), session );
         } else if (strings.get(0).equals("game_info")) {
@@ -133,14 +141,16 @@ public class MyWebSocketHandler {
     private void sendGameInfo(Session session) {
         System.out.println("Gotta send game info");
         for (GameSession game : currentGames.values()) {
-            try {
-                String message = "game, " + game.getSessionId() + ", "
-                        + game.getName() + ", " + game.getMaxOcc() + ", " + game.getCurrentOcc()
-                        + ", " + game.getNumRounds();
-                System.out.println(message);
-                session.getRemote().sendString(message);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (!game.isFull()) {
+                try {
+                    String message = "game, " + game.getSessionId() + ", "
+                            + game.getName() + ", " + game.getMaxOcc() + ", " + game.getCurrentOcc()
+                            + ", " + game.getNumRounds();
+                    System.out.println(message);
+                    session.getRemote().sendString(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -149,11 +159,17 @@ public class MyWebSocketHandler {
      * This method takes the String player id, finds the corresponding Player in the map, and
      * sets their turn confirmation to true
      */
-    private void parseConfirmation(String playerId) {
-        int id = Integer.parseInt(playerId);
+    private void parseConfirmation(Session session) {
+        Player p = null;
+        for (Player player : playerMap.values()) {
+            if (player.getWebSocketSession().equals(session)) {
+                p = player;
+            }
+        }
 
-        Player p = playerMap.get(id);
-        p.confirmTurn();
+        if (p != null) {
+            p.confirmTurn();
+        }
     }
 
     /**

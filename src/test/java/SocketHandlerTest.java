@@ -14,7 +14,7 @@ public class SocketHandlerTest {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         System.setOut(new PrintStream(bytes));
 
-        handler.onClose(2, "test");
+        handler.onClose(new TestSession(), 2, "test");
         assertEquals("Close: statusCode=" + 2 + ", reason=" + "test", bytes.toString().trim());
     }
 
