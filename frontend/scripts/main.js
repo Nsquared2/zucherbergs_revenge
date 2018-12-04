@@ -113,6 +113,7 @@ Game.prototype.getPlayer = function(id){
 // displays info in dash for the currently selected player
 Game.prototype.updateCurrentPlayer = function(){
   document.getElementById("messages-pane").innerHTML = this.currentPlayer.allMessages();
+  document.getElementById("messages-pane").scrollTop = document.getElementById("messages-pane").scrollHeight;
   
   document.getElementById("current-player").innerHTML = "to: "+this.currentPlayer.name;
   document.getElementById("request-select").value = this.currentPlayer.requesting;
