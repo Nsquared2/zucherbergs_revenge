@@ -133,4 +133,12 @@ public abstract class AIPlayer extends Object{
     public ActionType getActionForId(int id) {
         return currentRoundActions.get(id);
     }
+
+    public void adjustScore(int adjustment) {
+        this.score += adjustment;
+    }
+
+    public void removeEnemy(int id) {
+        enemy_ids.remove(id);
+    }
 }
