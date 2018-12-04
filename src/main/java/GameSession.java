@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class GameSession {
     private int sessionId;
     private String sessionName;
-    private String privateCode;
+    private String privateCode = "";
     private int roundTime;
     private int numOfHumans;
     private int numOfAI;
@@ -353,5 +353,24 @@ public class GameSession {
         for (AIPlayer ai : aiPlayers) {
             ai.removeEnemy(p.getPlayerId());
         }
+    }
+
+
+    public int calculatePlace(Player player) {
+        int place = 1;
+        for (Player p : playerMap.keySet()) {
+            if (!p.equals(player) && p.getCurrentScore() > player.getCurrentScore()) {
+                place++;
+            }
+        }
+        return place;
+    }
+
+    public boolean isPrivate() {
+        return !privateCode.equals("");
+    }
+
+    public String getPrivateCode() {
+        return privateCode;
     }
 }
