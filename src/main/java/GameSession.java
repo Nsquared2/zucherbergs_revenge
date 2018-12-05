@@ -96,7 +96,7 @@ public class GameSession {
         }
 
         for (int i = 0; i < numOfAI; i++) {
-            aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, enemyIds));
+            aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
         }
 
         for (Player p : playerMap.keySet()) {
@@ -187,7 +187,6 @@ public class GameSession {
     }
 
     public void endGame() {
-        //TODO add code for AI reinforcement learning
         for (Player p : playerMap.keySet()) {
             try {
                 List<Pair<Integer, String>> finalResults = new ArrayList<>();

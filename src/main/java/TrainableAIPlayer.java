@@ -90,6 +90,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             ActionType my_action = this.maximizeValue(enemy_action);
             Action action = new Action(my_action, this.id, enemy);
             actions.put(enemy, action);
+            currentRoundActions.put(enemy, my_action);
         }
 
         return actions;
