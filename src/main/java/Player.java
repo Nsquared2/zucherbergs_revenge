@@ -77,6 +77,9 @@ public class Player {
     }
 
     public ActionType getActionForId(int playerId) {
+        if (currentActions.get(playerId) == null) {
+            currentActions.put(playerId, ActionType.IGNORE);
+        }
         return currentActions.get(playerId);
     }
 
