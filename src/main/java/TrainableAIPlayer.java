@@ -78,7 +78,8 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             }
 
             //TODO: Take into account "prior"
-            double prior_weight = Math.exp(-round_id);
+//            double prior_weight = Math.exp(-round_id);
+            double prior_weight = 0;
             double dist_weight = 1.0 - prior_weight;
 
             Util.scalarArrayMultiply(prior, prior_weight);
