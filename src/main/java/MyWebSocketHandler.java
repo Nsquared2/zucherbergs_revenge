@@ -106,7 +106,7 @@ public class MyWebSocketHandler {
         } else if (strings.get(0).equals("update_player")) {
             updatePlayerSession(strings.get(1), session);
         } else if (strings.get(0).equals("join_private")) {
-            parseJoinPrivate(strings.get(1), strings.get(2), strings.get(3));
+            parseJoinPrivate(strings.get(1), strings.get(2));
         } else {
 
 
@@ -116,29 +116,29 @@ public class MyWebSocketHandler {
         }
     }
 
-    private void parseJoinPrivate(String playerId, String gameId, String code) {
+    private void parseJoinPrivate(String playerId, String code) {
         int id = Integer.parseInt(playerId);
-        int gID = Integer.parseInt(gameId);
-
         Player p = playerMap.get(id);
-        GameSession game = currentGames.get(gID);
 
-        if (game == null || !game.getPrivateCode().equals(code)) {
-            try {
-                p.getWebSocketSession().getRemote().sendString("game_join_failed");
+        for (GameSession g : currentGames.values()) {
+            if (g.getPrivateCode().equals(code)) {
+                g.addPlayer(p);
+                p.setGameSession(g);
+
+                try {
+                    p.getWebSocketSession().getRemote().sendString("game_joined, " + g.getSessionId());
+                } catch (IOException e) {
+                    System.out.println("Message send failed");
+                }
                 return;
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
-        game.addPlayer(p);
-        p.setGameSession(game);
-
         try {
-            p.getWebSocketSession().getRemote().sendString("game_joined, " + gID);
+            p.getWebSocketSession().getRemote().sendString("game_join_failed");
+            return;
         } catch (IOException e) {
-            System.out.println("Message send failed");
+            e.printStackTrace();
         }
     }
 
@@ -209,9 +209,11 @@ public class MyWebSocketHandler {
      */
     private void parseNewGame(List<String> input) {
         String name = input.get(0);
-        int numHumans = Integer.parseInt(input.get(1));
-        int numAIs = Integer.parseInt(input.get(2));
-        GameSession g = new GameSession(name, numHumans, numAIs);
+        int numRounds = Integer.parseInt(input.get(1));
+        int numHumans = Integer.parseInt(input.get(2));
+        int numAIs = Integer.parseInt(input.get(3));
+        String difficulty = input.get(4);
+        GameSession g = new GameSession(name, numHumans, numAIs, numRounds, difficulty);
         currentGames.put(g.getSessionId(), g);
 
         System.out.println("Added game: " + g.getName() + " and we have " + currentGames.values().size() + " current games");
@@ -332,11 +334,5 @@ public class MyWebSocketHandler {
 
     public GameSession getGameForId(int id) {
         return currentGames.get(id);
-    }
-
-    public void addTestGame() {
-        GameSession game = new GameSession("Test Game", 3, 3);
-        game.setId(1);
-        currentGames.put(1, game);
     }
 }

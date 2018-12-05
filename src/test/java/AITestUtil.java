@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class AITestUtil {
     public static ArrayList<Integer> dummy_ids(int num){
         ArrayList<Integer> ids = new ArrayList<Integer>();
-        for(int i = 1; i <= num; i++){
+        for(int i = 0; i <= num; i++){
             ids.add(i);
         }
         return ids;

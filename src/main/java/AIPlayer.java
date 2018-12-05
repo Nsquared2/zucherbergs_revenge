@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -40,7 +41,6 @@ public abstract class AIPlayer extends Object{
         this.eval_data = WekaData.makeDataset();
 
         addMapLayer();
-
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class AIPlayer extends Object{
      * Returns a list of Actions that the AI would like to perform,
      * corresponding to the input list of other Player IDs.
      */
-    abstract ArrayList<Action> round_action();
+    abstract HashMap<Integer, Action> round_action();
 
     /**
      * Updates the AI's current decision making policy and store round_results in round_actions
@@ -126,19 +126,11 @@ public abstract class AIPlayer extends Object{
        return this.rcv_comms;
     }
 
-    public void addEnemy(int id) {
-        enemy_ids.add(id);
-    }
-
     public ActionType getActionForId(int id) {
         return currentRoundActions.get(id);
     }
 
     public void adjustScore(int adjustment) {
         this.score += adjustment;
-    }
-
-    public void removeEnemy(int id) {
-        enemy_ids.remove(id);
     }
 }

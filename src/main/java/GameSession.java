@@ -22,38 +22,21 @@ public class GameSession {
     private List<AIPlayer> aiPlayers;
 
     private AIHandler aiHandler;
+    private String difficulty;
 
     private int totalRounds;
     private int currentRound;
 
-    public GameSession(String sessionName, int numOfHumans, int numOfAI) {
+    public GameSession(String sessionName, int numOfHumans, int numOfAI, int numRounds, String difficulty) {
         this.sessionName = sessionName;
         this.numOfHumans = numOfHumans;
         this.numOfAI = numOfAI;
-        this.totalRounds = 5;
+        this.totalRounds = numRounds;
         this.currentRound = 1;
         sessionId = new Random().nextInt();
         playerMap = new HashMap<>();
         aiPlayers = new ArrayList<>(numOfAI);
-
-        //TODO: Add AI players with the AI Handler
-        for (int i = 0; i < numOfAI; i++) {
-            Random r = new Random();
-            int ai_id = r.nextInt();
-            aiPlayers.add(AIHandler.createAi("easy", ai_id, "AI_" + i, new ArrayList<>()));
-        }
-
-        updateAIEnemyList();
-    }
-
-    private void updateAIEnemyList() {
-        for (AIPlayer ai : aiPlayers) {
-            for (AIPlayer other : aiPlayers) {
-                if (!other.equals(ai)) {
-                    ai.addEnemy(other.getId());
-                }
-            }
-        }
+        this.difficulty = difficulty;
     }
 
     public int getSessionId() {
@@ -83,14 +66,47 @@ public class GameSession {
      */
     public void addPlayer(Player p) {
         playerMap.put(p, p.getWebSocketSession());
-        for (AIPlayer ai : aiPlayers) {
-            ai.addEnemy(p.getPlayerId());
-        }
+
         for (Session s : playerMap.values()) {
+            String playerInfo = "player " + p.getPlayerId() + " " + p.getPlayerName();
             try {
-                s.getRemote().sendString("player_joined " + p.getPlayerId());
+                s.getRemote().sendString(playerInfo);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+
+        if (playerMap.size() >= numOfHumans) {
+            generateAIPlayers();
+        }
+    }
+
+    private void generateAIPlayers() {
+        ArrayList<Integer> enemyIds = new ArrayList<>();
+        List<Integer> aiIds = new ArrayList<>();
+        Random r = new Random();
+
+        for (int i = 0; i < numOfAI; i++) {
+            int ai_id = r.nextInt();
+            enemyIds.add(ai_id);
+            aiIds.add(ai_id);
+        }
+        for (Player p : playerMap.keySet()) {
+            enemyIds.add(p.getPlayerId());
+        }
+
+        for (int i = 0; i < numOfAI; i++) {
+            aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+        }
+
+        for (Player p : playerMap.keySet()) {
+            for (AIPlayer ai : aiPlayers) {
+                String playerInfo = "player " + ai.getId() + " " + ai.getName();
+                try {
+                    p.getWebSocketSession().getRemote().sendString(playerInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -146,6 +162,20 @@ public class GameSession {
         for (Player p: playerMap.keySet()) {
             p.sendScoreUpdate();
         }
+        for (AIPlayer ai : aiPlayers) {
+            ai.update_policy(getActionsTowardsAI(ai.getId()));
+        }
+    }
+
+    public HashMap<Integer, ActionType> getActionsTowardsAI(int aiId) {
+        HashMap<Integer, ActionType> actions = new HashMap<>();
+        for (Player p : playerMap.keySet()) {
+            actions.put(p.getPlayerId(), p.getActionForId(aiId));
+        }
+        for (AIPlayer ai : aiPlayers) {
+            actions.put(ai.id, ai.getActionForId(aiId));
+        }
+        return actions;
     }
 
     /**
@@ -157,7 +187,6 @@ public class GameSession {
     }
 
     public void endGame() {
-        //TODO add code for AI reinforcement learning
         for (Player p : playerMap.keySet()) {
             try {
                 List<Pair<Integer, String>> finalResults = new ArrayList<>();
@@ -249,14 +278,27 @@ public class GameSession {
                     theirAction = ActionType.IGNORE;
                 }
                 p.adjustScore(calculateScore(myAction, theirAction));
+                try {
+                    p.getWebSocketSession().getRemote().sendString("message server " + opponent.getPlayerId() +
+                            theirAction.getMessage() + "<br>" + myAction.getMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         for (AIPlayer ai : aiPlayers) {
+            ActionType myAction = p.getActionForId(ai.getId());
+            ActionType theirAction = ai.getActionForId(p.getPlayerId());
             p.adjustScore(calculateScore(
-                    p.getActionForId(ai.getId()),
-                    ai.getActionForId(p.getPlayerId())
-            ));
+                    myAction,
+                    theirAction));
+            try {
+                p.getWebSocketSession().getRemote().sendString("message server " + ai.getId() + " " +
+                        theirAction.getMessage() + "<br>" + myAction.getPerformerMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -350,9 +392,6 @@ public class GameSession {
 
     public void removePlayer(Player p) {
         playerMap.remove(p);
-        for (AIPlayer ai : aiPlayers) {
-            ai.removeEnemy(p.getPlayerId());
-        }
     }
 
 
@@ -360,6 +399,11 @@ public class GameSession {
         int place = 1;
         for (Player p : playerMap.keySet()) {
             if (!p.equals(player) && p.getCurrentScore() > player.getCurrentScore()) {
+                place++;
+            }
+        }
+        for (AIPlayer ai : aiPlayers) {
+            if (ai.score > player.getCurrentScore()) {
                 place++;
             }
         }

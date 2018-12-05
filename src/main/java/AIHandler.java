@@ -41,8 +41,11 @@ public class AIHandler {
     static public AIPlayer createAi(String difficulty, int id, String name, ArrayList<Integer> ids){
         AIPlayer ai_player;
 
-        if(difficulty.equals("easy")){
+        if(difficulty.contains("easy")){
             ai_player = new EasyAIPlayer(id, name, ids);
+        }
+        else if(difficulty.equals("bias")){
+            ai_player = new BiasAIPlayer(id, name, ids);
         }
         else if(difficulty.equals("medium")){
             NaiveBayesUpdateable model = new NaiveBayesUpdateable();

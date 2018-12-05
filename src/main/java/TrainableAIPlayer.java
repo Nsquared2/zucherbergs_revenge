@@ -58,9 +58,9 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
      * Creates an Action for each of the Player IDs given as input using C model
      */
     @Override
-    ArrayList<Action> round_action() {
+    HashMap<Integer, Action> round_action() {
         int num_actions = ActionType.values().length;
-        ArrayList<Action> actions = new ArrayList<Action>(0);
+        HashMap<Integer, Action> actions = new HashMap<Integer, Action>();
         int round_id = rcv_comms.size()-1;
 
         for(int enemy: this.enemy_ids) {
@@ -78,7 +78,8 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             }
 
             //TODO: Take into account "prior"
-            double prior_weight = Math.exp(-round_id);
+//            double prior_weight = Math.exp(-round_id);
+            double prior_weight = 0;
             double dist_weight = 1.0 - prior_weight;
 
             Util.scalarArrayMultiply(prior, prior_weight);
@@ -89,7 +90,8 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             ActionType enemy_action = Util.enumIndexToValue(ActionType.class, max_action);
             ActionType my_action = this.maximizeValue(enemy_action);
             Action action = new Action(my_action, this.id, enemy);
-            actions.add(action);
+            actions.put(enemy, action);
+            currentRoundActions.put(enemy, my_action);
         }
 
         return actions;
@@ -107,9 +109,11 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
 
             //Update round history
             this.round_instances.add(instance);
-            this.round_instances.lastInstance();
+//            this.round_instances.lastInstance();
             //Update classifier
-            try{ model.updateClassifier(this.round_instances.lastInstance());}
+            try{
+                model.updateClassifier(this.round_instances.lastInstance());
+            }
             catch (Exception e) {
                 System.out.println("Exception in trainable AI update " + e.toString());
                 System.exit(1);

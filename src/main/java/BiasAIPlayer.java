@@ -5,17 +5,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
+import java.lang.Math;
 
 /**
- * Basic AI player class that corresponds to the Easy difficulty.
+ * Basic AI player class that corresponds to the Bias difficulty.
  * This player has random behavior and does not need to be trained by the AI handler.
  */
-public class EasyAIPlayer extends AIPlayer{
+public class BiasAIPlayer extends AIPlayer{
     private Random rand = new Random();
     private float comm_thresh = 0.9f;
+    private int bias;
 
-    EasyAIPlayer(int id, String name, ArrayList<Integer> ids){
+    BiasAIPlayer(int id, String name, ArrayList<Integer> ids){
         super(id, name, ids);
+        this.bias = this.rand.nextInt(3);
+
     }
 
     /**
@@ -45,7 +49,13 @@ public class EasyAIPlayer extends AIPlayer{
         HashMap<Integer, Action> actions = new HashMap<>();
 
         for(int reciever: this.enemy_ids) {
-            ActionType action_type = ActionType.values()[rand.nextInt(num_actions)];
+            int action_id;
+            if(Math.random() > 0.8)
+                action_id = this.bias;
+            else
+                action_id = rand.nextInt(num_actions);
+
+            ActionType action_type = ActionType.values()[action_id];
 
             Action action = new Action(action_type, this.id, reciever);
             actions.put(reciever, action);
@@ -56,7 +66,7 @@ public class EasyAIPlayer extends AIPlayer{
     }
 
     /**
-     *Easy player does not update policy so this function just stores round results
+     *Bias player does not update policy so this function just stores round results
      */
     @Override
     void update_policy(HashMap<Integer, ActionType> round_results){
@@ -75,3 +85,4 @@ public class EasyAIPlayer extends AIPlayer{
         addMapLayer();
     }
 }
+

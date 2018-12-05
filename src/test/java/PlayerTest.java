@@ -11,7 +11,7 @@ public class PlayerTest {
 
     @Test
     public void basicPlayerTest() {
-        GameSession game = new GameSession("Test", 3, 3);
+        GameSession game = new GameSession("Test", 3, 3, 5, "easy");
         Player p = new Player("Bob", 3, new TestSession(), game);
 
         p.confirmTurn();
@@ -24,7 +24,7 @@ public class PlayerTest {
 
     @Test
     public void testPlayerActions() {
-        GameSession game = new GameSession("Test", 3, 3);
+        GameSession game = new GameSession("Test", 3, 3, 5, "easy");
         Player p = new Player("Bob", 3, new TestSession(), game);
         Player p2 = new Player("Frank", 4, new TestSession(), game);
 
@@ -35,7 +35,7 @@ public class PlayerTest {
 
     @Test
     public void testPlayerMessaging() {
-        GameSession game = new GameSession("Test", 3, 3);
+        GameSession game = new GameSession("Test", 3, 3, 5, "easy");
         Player p = new Player("Bob", 3, new TestSession(), game);
         Player p2 = new Player("Frank", 4, new TestSession(), game);
 
