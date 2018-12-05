@@ -58,4 +58,16 @@ public class Util {
         List<E> vals = Arrays.asList(my_enum.getEnumConstants());
         return vals.get(index);
     }
+
+    public static void scalarArrayMultiply(double[] arr, double scalar){
+        for(int i = 0; i < arr.length; i++){
+            arr[i] *= scalar;
+        }
+    }
+
+    public static void elementwiseAdd(double[] arr1, double[] arr2){
+        for(int i = 0; i < arr1.length; i++){
+            arr1[i] += arr2[i];
+        }
+    }
 }
