@@ -108,7 +108,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
 
             //Update round history
             this.round_instances.add(instance);
-            this.round_instances.lastInstance();
+//            this.round_instances.lastInstance();
             //Update classifier
             try{
                 model.updateClassifier(this.round_instances.lastInstance());
