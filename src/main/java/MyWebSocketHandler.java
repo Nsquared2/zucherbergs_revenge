@@ -105,12 +105,40 @@ public class MyWebSocketHandler {
             sendGameInfo(session);
         } else if (strings.get(0).equals("update_player")) {
             updatePlayerSession(strings.get(1), session);
+        } else if (strings.get(0).equals("join_private")) {
+            parseJoinPrivate(strings.get(1), strings.get(2), strings.get(3));
         } else {
 
 
             // Invalid messages result in System.out tracking
             // TODO: Switch to a logging framework?
             System.out.println("Invalid message from client");
+        }
+    }
+
+    private void parseJoinPrivate(String playerId, String gameId, String code) {
+        int id = Integer.parseInt(playerId);
+        int gID = Integer.parseInt(gameId);
+
+        Player p = playerMap.get(id);
+        GameSession game = currentGames.get(gID);
+
+        if (game == null || !game.getPrivateCode().equals(code)) {
+            try {
+                p.getWebSocketSession().getRemote().sendString("game_join_failed");
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        game.addPlayer(p);
+        p.setGameSession(game);
+
+        try {
+            p.getWebSocketSession().getRemote().sendString("game_joined, " + gID);
+        } catch (IOException e) {
+            System.out.println("Message send failed");
         }
     }
 
@@ -138,10 +166,13 @@ public class MyWebSocketHandler {
         }
     }
 
+    /**
+     * Sends all of the relevant information for any game sessions that are public and not filled to maximum capacity.
+     */
     private void sendGameInfo(Session session) {
         System.out.println("Gotta send game info");
         for (GameSession game : currentGames.values()) {
-            if (!game.isFull()) {
+            if (!game.isFull() && !game.isPrivate()) {
                 try {
                     String message = "game, " + game.getSessionId() + ", "
                             + game.getName() + ", " + game.getMaxOcc() + ", " + game.getCurrentOcc()
@@ -185,8 +216,12 @@ public class MyWebSocketHandler {
 
         System.out.println("Added game: " + g.getName() + " and we have " + currentGames.values().size() + " current games");
 
-        // time <time> code <code>
-        //TODO: Add code to handle optional parameters (private code, round limit)
+        if (input.indexOf("time") != -1) {
+            g.setRoundTime(Integer.parseInt(input.get(input.indexOf("time") + 1)));
+        }
+        if (input.indexOf("code") != -1) {
+            g.setPrivateCode(input.get(input.indexOf("code") + 1));
+        }
     }
 
     private void parseNewPlayer(String playerName, Session sess) {
