@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -31,6 +32,8 @@ public abstract class AIPlayer extends Object{
     AIPlayer(int id, String name, ArrayList<Integer> ids){
         this.id = id;
         this.name = name;
+        int id_pos = ids.indexOf(id);
+        ids.remove(id_pos);
         this.enemy_ids = ids;
         this.enemy_ids.remove(Integer.valueOf(id));
         this.num_enemies = enemy_ids.size();
