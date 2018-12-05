@@ -39,6 +39,10 @@ document.getElementById("submit").addEventListener("click",function(event){
     message += document.getElementById("gameCode").value;
   }
 
+  if(document.getElementById("biased").checked){
+    message += " biased";
+  }
+
   // send the message
   ws.send(message);
   console.log(message);
