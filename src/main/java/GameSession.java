@@ -19,15 +19,16 @@ public class GameSession {
     private int numOfHumans;
     private int numOfAI;
     private Map<Player, Session> playerMap;
-    private List<AIPlayer> aiPlayers;
+    private ArrayList<AIPlayer> aiPlayers;
 
     private AIHandler aiHandler;
     private String difficulty;
+    private boolean bias;
 
     private int totalRounds;
     private int currentRound;
 
-    public GameSession(String sessionName, int numOfHumans, int numOfAI, int numRounds, String difficulty) {
+    public GameSession(String sessionName, int numOfHumans, int numOfAI, int numRounds, String difficulty, boolean bias) {
         this.sessionName = sessionName;
         this.numOfHumans = numOfHumans;
         this.numOfAI = numOfAI;
@@ -37,6 +38,11 @@ public class GameSession {
         playerMap = new HashMap<>();
         aiPlayers = new ArrayList<>(numOfAI);
         this.difficulty = difficulty;
+        this.bias = bias;
+
+        if (bias) {
+            this.numOfAI++;
+        }
     }
 
     public int getSessionId() {
@@ -67,10 +73,10 @@ public class GameSession {
     public void addPlayer(Player p) {
         playerMap.put(p, p.getWebSocketSession());
 
-        for (Session s : playerMap.values()) {
+        for (Player player : playerMap.keySet()) {
             String playerInfo = "player " + p.getPlayerId() + " " + p.getPlayerName();
             try {
-                s.getRemote().sendString(playerInfo);
+                player.getWebSocketSession().getRemote().sendString(playerInfo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -96,7 +102,15 @@ public class GameSession {
         }
 
         for (int i = 0; i < numOfAI; i++) {
-            aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+            if (i < numOfAI - 1) {
+                aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+            } else {
+                if (bias) {
+                    aiPlayers.add(AIHandler.createAi("bias", aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+                } else {
+                    aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+                }
+            }
         }
 
         for (Player p : playerMap.keySet()) {
@@ -187,6 +201,8 @@ public class GameSession {
     }
 
     public void endGame() {
+//        AIHandler.saveAiPlayerObservations(aiPlayers);
+
         for (Player p : playerMap.keySet()) {
             try {
                 List<Pair<Integer, String>> finalResults = new ArrayList<>();
@@ -278,9 +294,10 @@ public class GameSession {
                     theirAction = ActionType.IGNORE;
                 }
                 p.adjustScore(calculateScore(myAction, theirAction));
+
                 try {
-                    p.getWebSocketSession().getRemote().sendString("message server " + opponent.getPlayerId() +
-                            theirAction.getMessage() + "<br>" + myAction.getMessage());
+                    p.getWebSocketSession().getRemote().sendString("message server " + opponent.getPlayerId() + " "
+                            + theirAction.getMessage() + "<br>" + myAction.getPerformerMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -310,20 +327,20 @@ public class GameSession {
             case COOPERATE:
                 switch(theirAction) {
                     case COOPERATE:
-                        return 1;
+                        return 2;
                     case BETRAY:
-                        return 0;
+                        return -1;
                     case IGNORE:
                         return 1;
                 }
             case BETRAY:
                 switch(theirAction) {
                     case COOPERATE:
-                        return 2;
-                    case BETRAY:
-                        return 0;
-                    case IGNORE:
                         return 1;
+                    case BETRAY:
+                        return -1;
+                    case IGNORE:
+                        return 0;
                 }
             case IGNORE:
                 return 0;
