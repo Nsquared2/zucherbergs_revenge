@@ -18,7 +18,7 @@ public class AIFunctional {
         ActionType ai_action = ActionType.BETRAY;
 
         for (int r = 0; r < 2; r++) {
-            ArrayList<Action> ai_actions = ai.round_action();
+            HashMap<Integer, Action> ai_actions = ai.round_action();
             ActionType action = ai_actions.get(0).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
@@ -37,7 +37,7 @@ public class AIFunctional {
     @Test
     public void AI3(){
         AIPlayer ai = AIHandler.createAi("medium", 0, "joe", AITestUtil.dummy_ids(2));
-        ArrayList<Action> ai_actions = ai.round_action();
+        HashMap<Integer, Action> ai_actions = ai.round_action();
         Assert.assertEquals(2, ai_actions.size());
     }
 
@@ -80,9 +80,9 @@ public class AIFunctional {
             }
 
             //Get actions for both ai players
-            ArrayList<Action> med_actions = ai_hard.round_action();
+            HashMap<Integer, Action> med_actions = ai_hard.round_action();
             ActionType med_action = med_actions.get(0).getAction();
-            ArrayList<Action> hard_actions = ai_hard.round_action();
+            HashMap<Integer, Action> hard_actions = ai_hard.round_action();
             ActionType hard_action = hard_actions.get(0).getAction();
 
             //update AI players
@@ -114,10 +114,10 @@ public class AIFunctional {
             ai_hard.update_policy(dummy_results);
 
             // Get actions for both ai players
-            ArrayList<Action> med_action_array = ai_hard.round_action();
+            HashMap<Integer,Action> med_action_array = ai_hard.round_action();
             ActionType med_action = med_action_array.get(0).getAction();
             med_actions.add(med_action);
-            ArrayList<Action> hard_action_array = ai_hard.round_action();
+            HashMap<Integer, Action> hard_action_array = ai_hard.round_action();
             ActionType hard_action = hard_action_array.get(0).getAction();
             hard_actions.add(hard_action);
         }
@@ -141,7 +141,7 @@ public class AIFunctional {
 
 
         for (int r = 0; r < 2; r++) {
-            ArrayList<Action> ai_actions = ai.round_action();
+            HashMap<Integer, Action> ai_actions = ai.round_action();
             ActionType action = ai_actions.get(0).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
@@ -193,7 +193,7 @@ public class AIFunctional {
         AIPlayer ai = AIHandler.createAi("easy", 0, "joe", AITestUtil.dummy_ids(1));
 
         for (int r = 0; r < 2; r++) {
-            ArrayList<Action> ai_actions = ai.round_action();
+            HashMap<Integer, Action> ai_actions = ai.round_action();
             ActionType action = ai_actions.get(0).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
