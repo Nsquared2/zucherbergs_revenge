@@ -94,7 +94,6 @@ public class Player {
     public void sendScoreUpdate() {
         try {
             webSocketSession.getRemote().sendString("new_score " + currentScore);
-            //TODO: also send current place
             webSocketSession.getRemote().sendString("new_place " + gameSession.calculatePlace(this));
         } catch (IOException e) {
             System.out.println("Message send failed");

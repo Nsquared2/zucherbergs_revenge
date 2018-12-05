@@ -90,6 +90,7 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             ActionType my_action = this.maximizeValue(enemy_action);
             Action action = new Action(my_action, this.id, enemy);
             actions.add(action);
+            currentRoundActions.put(enemy, my_action);
         }
 
         return actions;
@@ -109,7 +110,9 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             this.round_instances.add(instance);
             this.round_instances.lastInstance();
             //Update classifier
-            try{ model.updateClassifier(this.round_instances.lastInstance());}
+            try{
+                model.updateClassifier(this.round_instances.lastInstance());
+            }
             catch (Exception e) {
                 System.out.println("Exception in trainable AI update " + e.toString());
                 System.exit(1);

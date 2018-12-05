@@ -40,7 +40,6 @@ public abstract class AIPlayer extends Object{
         this.eval_data = WekaData.makeDataset();
 
         addMapLayer();
-
     }
 
     /**
@@ -126,19 +125,11 @@ public abstract class AIPlayer extends Object{
        return this.rcv_comms;
     }
 
-    public void addEnemy(int id) {
-        enemy_ids.add(id);
-    }
-
     public ActionType getActionForId(int id) {
         return currentRoundActions.get(id);
     }
 
     public void adjustScore(int adjustment) {
         this.score += adjustment;
-    }
-
-    public void removeEnemy(int id) {
-        enemy_ids.remove(id);
     }
 }

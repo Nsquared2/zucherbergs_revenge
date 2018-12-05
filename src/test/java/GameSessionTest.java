@@ -7,7 +7,7 @@ public class GameSessionTest {
 
     @Test
     public void basicSessionTest() {
-        GameSession game = new GameSession("Test", 2, 2);
+        GameSession game = new GameSession("Test", 2, 2, 5, "easy");
 
         game.setPrivateCode("Private");
         game.setRoundTime(30);
@@ -17,7 +17,7 @@ public class GameSessionTest {
 
     @Test
     public void testRoundAndGameEnds() {
-        GameSession game = new GameSession("Test", 1, 1);
+        GameSession game = new GameSession("Test", 1, 1, 5, "easy");
         Player p = new Player("Bob", 1, new TestSession(), game);
         game.setTotalRounds(3);
 
@@ -29,7 +29,7 @@ public class GameSessionTest {
         assertFalse(game.isRoundOver());
         assertFalse(game.isGameOver());
 
-        game = new GameSession("Test", 2, 2);
+        game = new GameSession("Test", 2, 2, 5, "easy");
         Player frank = new Player("Frank", 3, new TestSession(), game);
         game.addPlayer(frank);
 
@@ -43,7 +43,7 @@ public class GameSessionTest {
 
     @Test
     public void testUpdatingScoresAndGettingPlayers() {
-        GameSession game = new GameSession("Test", 3, 0);
+        GameSession game = new GameSession("Test", 3, 0, 5, "easy");
         Player bob = new Player("Bob", 3, new TestSession(), game);
         Player frank = new Player("Frank", 4, new TestSession(), game);
         Player sally = new Player("Sally", 5, new TestSession(), game);
