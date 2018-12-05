@@ -13,9 +13,18 @@
     <form>
       name: <input id="gameName" type="text"></input><br>
 
+      # of rounds: <input id="rounds" type="number" value="5" min="1"></input><br>
+
       # of human players: <input id="players" type="number" value="3" min="1"></input><br>
 
       # of AI players: <input id="ais" type="number" value="2" min="0" max="10"></input><br>
+
+      AI difficulty:
+        <select id="ai-difficulty">
+          <option>easy</option>
+          <option>medium</option>
+          <option>hard</option>
+        </select><br>
 
       time limit? (seconds) <input id="timeLimit" type="number" max="100" min="10" value="30" disabled="true"></input> <input id="timeLimitCheck" type="checkbox"></input> <br>
 

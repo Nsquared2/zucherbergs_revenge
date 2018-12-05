@@ -1,5 +1,5 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.42.193:8090/");
+var ws = new WebSocket("ws://172.20.44.27:8090/");
 
 // writes a cookie
 function setCookie(cname, cvalue, minutes) {
@@ -163,7 +163,7 @@ Game.prototype.changeAction = function(player_id, action){
 }
 
 Game.prototype.update_info = function(){
-  document.getElementById("score").innerHTML = "Score: "+this.you.score+"<br>"+this.you.place;
+  document.getElementById("score").innerHTML = "Score: "+this.you.score+"<br>Place: "+this.you.place;
   document.getElementById("round").innerHTML = "Round "+this.round+"/"+this.rounds;
 }
 
@@ -193,7 +193,6 @@ function appendMessage(text, who){
   document.getElementById("messages-pane").innerHTML += message;
 }
 
-// TEST DATA
 me = new You();
 
 game = new Game("GAMENAME", 100, false, me);
@@ -216,7 +215,7 @@ ws.onmessage = function (evt) {
     case "message":
       // the message is a message to display in the chat
       if(message[1] == "server"){
-        game.players[0].messages.push(new Message("server",message.slice(2,message.length).join(" ")));
+        game.getPlayer(parseInt(message[2])).messages.push(new Message("server",message.slice(3,message.length).join(" ")));
       }else if(parseInt(message[2]) == game.you.id){
         game.getPlayer(parseInt(message[1])).messages.push(new Message("you",message.slice(3,message.length).join(" ")));
       }else{
@@ -230,6 +229,10 @@ ws.onmessage = function (evt) {
       break;
     case "new_score":
       game.you.score = parseInt(message[1]);
+      game.update_info();
+      break;
+    case "new_place":
+      game.you.place = parseInt(message[1]);
       game.update_info();
       break;
     case "round_number":

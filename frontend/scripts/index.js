@@ -41,7 +41,7 @@ Game.prototype.show = function(){
 
 setCookie("playername",prompt("Player Name"),10);
 
-var ws = new WebSocket("ws://172.20.42.193:8090/");
+var ws = new WebSocket("ws://172.20.44.27:8090/");
 
 ws.onopen = function(){
   // declare new player
@@ -80,10 +80,6 @@ ws.onmessage = function (evt) {
   }
 };
 
-// some fake data to show
-game = new Game(1, "test my game boi", 80, 17, 30);
-game.show();
-
 
 // in case of network or server issues:
 ws.onclose = function() {
@@ -99,8 +95,8 @@ function joingame(id){
 }
 
 document.getElementById("sendgamecode").addEventListener("click",function(){
-  ws.send("join code "+document.getElementById("gamecode").value);
-  console.log("OUT: join code "+document.getElementById("gamecode").value);
+  ws.send("join_private " + getCookie("playerid") + " " + document.getElementById("gamecode").value);
+  console.log("OUT: join_private " + getCookie("playerid") + " " + document.getElementById("gamecode").value);
 });
 
 
