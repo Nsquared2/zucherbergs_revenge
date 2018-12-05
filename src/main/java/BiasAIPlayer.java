@@ -42,11 +42,11 @@ public class BiasAIPlayer extends AIPlayer{
     /**
      * Creates a random Action for each of the Player IDs given as input.
      */
-    ArrayList<Action> round_action() {
+    HashMap<Integer, Action> round_action() {
         currentRoundActions.clear();
 
         int num_actions = ActionType.values().length;
-        ArrayList<Action> actions = new ArrayList<Action>(0);
+        HashMap<Integer, Action> actions = new HashMap<>();
 
         for(int reciever: this.enemy_ids) {
             int action_id;
@@ -58,7 +58,7 @@ public class BiasAIPlayer extends AIPlayer{
             ActionType action_type = ActionType.values()[action_id];
 
             Action action = new Action(action_type, this.id, reciever);
-            actions.add(action);
+            actions.put(reciever, action);
             currentRoundActions.put(reciever, action_type);
         }
 

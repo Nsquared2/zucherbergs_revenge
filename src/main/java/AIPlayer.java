@@ -113,7 +113,7 @@ public abstract class AIPlayer extends Object{
      * Returns a list of Actions that the AI would like to perform,
      * corresponding to the input list of other Player IDs.
      */
-    abstract ArrayList<Action> round_action();
+    abstract HashMap<Integer, Action> round_action();
 
     /**
      * Updates the AI's current decision making policy and store round_results in round_actions

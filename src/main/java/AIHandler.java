@@ -44,7 +44,7 @@ public class AIHandler {
         if(difficulty.contains("easy")){
             ai_player = new EasyAIPlayer(id, name, ids);
         }
-        if(difficulty.equals("bias")){
+        else if(difficulty.equals("bias")){
             ai_player = new BiasAIPlayer(id, name, ids);
         }
         else if(difficulty.equals("medium")){
