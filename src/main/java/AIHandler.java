@@ -44,6 +44,9 @@ public class AIHandler {
         if(difficulty.equals("easy")){
             ai_player = new EasyAIPlayer(id, name, ids);
         }
+        if(difficulty.equals("bias")){
+            ai_player = new BiasAIPlayer(id, name, ids);
+        }
         else if(difficulty.equals("medium")){
             NaiveBayesUpdateable model = new NaiveBayesUpdateable();
             initializeModel(model, medium_model_path);
