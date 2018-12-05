@@ -109,7 +109,9 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
             this.round_instances.add(instance);
 //            this.round_instances.lastInstance();
             //Update classifier
-            try{ model.updateClassifier(this.round_instances.lastInstance());}
+            try{
+                model.updateClassifier(this.round_instances.lastInstance());
+            }
             catch (Exception e) {
                 System.out.println("Exception in trainable AI update " + e.toString());
                 System.exit(1);
