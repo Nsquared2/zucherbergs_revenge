@@ -51,11 +51,9 @@ public abstract class AIPlayer extends Object{
      * @return Action that maximizes value for AI
      */
     ActionType maximizeValue(ActionType enemy_action){
-        //TODO: @Vincent Redo action table
-        //TODO: @Mike create maximize_reward and minimize_risk modes
         switch(enemy_action){
             case COOPERATE:
-                return ActionType.COOPERATE;
+                return ActionType.BETRAY;
             case BETRAY:
                 return ActionType.IGNORE;
             case IGNORE:
