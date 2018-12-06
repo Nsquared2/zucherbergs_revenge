@@ -19,7 +19,7 @@ public class AIFunctional {
 
         for (int r = 0; r < 2; r++) {
             HashMap<Integer, Action> ai_actions = ai.round_action();
-            ActionType action = ai_actions.get(0).getAction();
+            ActionType action = ai_actions.get(1).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_choice);
@@ -81,7 +81,7 @@ public class AIFunctional {
 
             //Get actions for both ai players
             HashMap<Integer, Action> med_actions = ai_hard.round_action();
-            ActionType med_action = med_actions.get(0).getAction();
+            ActionType med_action = med_actions.get(-1).getAction();
             HashMap<Integer, Action> hard_actions = ai_hard.round_action();
             ActionType hard_action = hard_actions.get(0).getAction();
 
