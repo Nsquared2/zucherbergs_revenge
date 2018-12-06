@@ -12,6 +12,7 @@ public abstract class AIPlayer extends Object{
     protected Random rand = new Random();
     protected int id;
     private String name;
+    private String anonymousName;
     protected ArrayList<Integer> enemy_ids;
     protected int num_enemies;
     protected ArrayList<Multimap<Integer, Communication>> rcv_comms;
@@ -135,5 +136,13 @@ public abstract class AIPlayer extends Object{
 
     public void adjustScore(int adjustment) {
         this.score += adjustment;
+    }
+
+    public void setAnonymousName(int i) {
+        this.anonymousName = "Player_" + i;
+    }
+
+    public String getAnonymousName() {
+        return this.anonymousName;
     }
 }

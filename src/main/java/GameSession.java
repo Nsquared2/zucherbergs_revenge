@@ -72,9 +72,10 @@ public class GameSession {
      */
     public void addPlayer(Player p) {
         playerMap.put(p, p.getWebSocketSession());
+        p.setAnonymousName(playerMap.size());
 
         for (Player player : playerMap.keySet()) {
-            String playerInfo = "player " + p.getPlayerId() + " " + p.getPlayerName();
+            String playerInfo = "player " + p.getPlayerId() + " " + p.getAnonymousName();
             try {
                 player.getWebSocketSession().getRemote().sendString(playerInfo);
             } catch (Exception e) {
@@ -103,19 +104,25 @@ public class GameSession {
 
         for (int i = 0; i < numOfAI; i++) {
             if (i < numOfAI - 1) {
-                aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+                AIPlayer newAi = AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
+                newAi.setAnonymousName(playerMap.size() + i);
+                aiPlayers.add(newAi);
             } else {
                 if (bias) {
-                    aiPlayers.add(AIHandler.createAi("bias", aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+                    AIPlayer newAi = AIHandler.createAi("bias", aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
+                    newAi.setAnonymousName(playerMap.size() + i);
+                    aiPlayers.add(newAi);
                 } else {
-                    aiPlayers.add(AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds)));
+                    AIPlayer newAi = AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
+                    newAi.setAnonymousName(playerMap.size() + i);
+                    aiPlayers.add(newAi);
                 }
             }
         }
 
         for (Player p : playerMap.keySet()) {
             for (AIPlayer ai : aiPlayers) {
-                String playerInfo = "player " + ai.getId() + " " + ai.getName();
+                String playerInfo = "player " + ai.getId() + " " + ai.getAnonymousName();
                 try {
                     p.getWebSocketSession().getRemote().sendString(playerInfo);
                 } catch (Exception e) {
@@ -387,7 +394,7 @@ public class GameSession {
 
         for (Player opp : playerMap.keySet()) {
             if (!opp.equals(p)) {
-                String playerInfo = "player " + opp.getPlayerId() + " " + opp.getPlayerName();
+                String playerInfo = "player " + opp.getPlayerId() + " " + opp.getAnonymousName();
                 try {
                     p.getWebSocketSession().getRemote().sendString(playerInfo);
                 } catch (Exception e) {
@@ -397,7 +404,7 @@ public class GameSession {
         }
 
         for (AIPlayer ai : aiPlayers) {
-            String playerInfo = "player " + ai.getId() + " " + ai.getName();
+            String playerInfo = "player " + ai.getId() + " " + ai.getAnonymousName();
             System.out.println(playerInfo);
             try {
                 p.getWebSocketSession().getRemote().sendString(playerInfo);

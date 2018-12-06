@@ -161,8 +161,6 @@ public class MyWebSocketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 
