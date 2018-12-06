@@ -11,6 +11,14 @@ public class AITestUtil {
         return ids;
     }
 
+    public static ArrayList<Integer> dummy_ids(int num1, int num2){
+        ArrayList<Integer> ids = new ArrayList<Integer>();
+        for(int i = num1; i <= num2; i++){
+            ids.add(i);
+        }
+        return ids;
+    }
+
     public static void setAIDirs(){
         AIHandler.setDataPathForTesting("./ai_test/data/");
         AIHandler.setModelPathForTesting("./ai_test/models/");

@@ -48,7 +48,7 @@ public class AIFunctional {
     public void AI4(){
         ActionType dummy_choice = ActionType.BETRAY;
         AIPlayer ai_med = AIHandler.createAi("medium", 0, "joe", AITestUtil.dummy_ids(1));
-        AIPlayer ai_hard = AIHandler.createAi("hard", -1, "bob", AITestUtil.dummy_ids(1));
+        AIPlayer ai_hard = AIHandler.createAi("hard", 1, "bob", AITestUtil.dummy_ids(1));
 
         //Ordered list of actions dummy player will do
         ArrayList<ActionType> dummy_actions = new ArrayList<>();
@@ -61,7 +61,7 @@ public class AIFunctional {
         }
 
         //Ordered list of communication sequences that trigger actions above
-        ArrayList<ArrayList<Communication>> comm_sets_med = genCommSets(0);
+        ArrayList<ArrayList<Communication>> comm_sets_med = genCommSets(1);
         ArrayList<ArrayList<Communication>> comm_sets_hard = genCommSets(1);
 
         //Indexes that determine what dummy player will do for this game
@@ -80,14 +80,15 @@ public class AIFunctional {
             }
 
             //Get actions for both ai players
-            HashMap<Integer, Action> med_actions = ai_hard.round_action();
-            ActionType med_action = med_actions.get(-1).getAction();
+            HashMap<Integer, Action> med_actions = ai_med.round_action();
+            ActionType med_action = med_actions.get(1).getAction();
             HashMap<Integer, Action> hard_actions = ai_hard.round_action();
             ActionType hard_action = hard_actions.get(0).getAction();
 
             //update AI players
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_actions.get(action_ids[r]));
+            dummy_results.put(0, dummy_actions.get(action_ids[r]));
             ai_med.update_policy(dummy_results);
             ai_hard.update_policy(dummy_results);
         }
@@ -110,6 +111,7 @@ public class AIFunctional {
             //update AI players
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_actions.get(action_ids[r]));
+            dummy_results.put(0, dummy_actions.get(action_ids[r]));
             ai_med.update_policy(dummy_results);
             ai_hard.update_policy(dummy_results);
 
@@ -142,7 +144,7 @@ public class AIFunctional {
 
         for (int r = 0; r < 2; r++) {
             HashMap<Integer, Action> ai_actions = ai.round_action();
-            ActionType action = ai_actions.get(0).getAction();
+            ActionType action = ai_actions.get(1).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_choice);
