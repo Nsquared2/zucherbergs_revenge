@@ -41,7 +41,7 @@ Game.prototype.show = function(){
 
 
 // connect to server
-var ws = new WebSocket("ws://172.20.44.27:8090/");
+var ws = new WebSocket("ws://172.20.27.209:8090/");
 
 ws.onopen = function(){
   // declare new player
