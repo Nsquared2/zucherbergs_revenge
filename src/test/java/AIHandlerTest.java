@@ -25,8 +25,8 @@ public class AIHandlerTest{
         Communication comm = new Communication(CommType.PROMISE_BETRAY, 0, 1);
         ai.receiveMessage(0, comm);
         HashMap<Integer, Action> action = ai.round_action();
-        ActionType actual = action.get(0).getAction();
-        ActionType ans = ActionType.COOPERATE;
+        ActionType actual = action.get(1).getAction();
+        ActionType ans = ActionType.BETRAY;
         Assert.assertEquals(ans, actual);
     }
 
@@ -45,8 +45,8 @@ public class AIHandlerTest{
         Communication comm = new Communication(CommType.PROMISE_BETRAY, 0, 1);
         ai.receiveMessage(0, comm);
         HashMap<Integer, Action> action = ai.round_action();
-        ActionType actual = action.get(0).getAction();
-        ActionType ans = ActionType.COOPERATE;
+        ActionType actual = action.get(1).getAction();
+        ActionType ans = ActionType.BETRAY;
         Assert.assertEquals(ans, actual);
     }
 

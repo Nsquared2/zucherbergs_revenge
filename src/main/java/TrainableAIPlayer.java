@@ -1,6 +1,5 @@
 import java.util.*;
 
-import com.google.common.collect.ArrayListMultimap;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.UpdateableClassifier;
@@ -17,7 +16,6 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
     C base_model;
     HashMap<Integer, C> models;
     private float comm_thresh = 0.9f;
-    private Random rand = new Random();
 
     TrainableAIPlayer(int id, String name, ArrayList<Integer> ids, C model){
         super(id, name, ids);
@@ -35,23 +33,6 @@ public class TrainableAIPlayer<C extends UpdateableClassifier & Classifier> exte
         }
     }
 
-    /**
-     * Returns a new Communication that will be sent to a random player, and has a random communication type.
-     */
-    @Override
-    Communication message_action(){
-        if(rand.nextFloat() > this.comm_thresh){
-            int num_coms = CommType.values().length;
-            CommType comm_type = CommType.values()[rand.nextInt(num_coms)];
-            int receiver = this.enemy_ids.get(rand.nextInt(this.enemy_ids.size()));
-
-            Communication comm = new Communication(comm_type, this.id, receiver);
-            return comm;
-        }
-        else{
-            return null;
-        }
-    }
 
 
     /**

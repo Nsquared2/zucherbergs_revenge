@@ -1,38 +1,18 @@
-import com.google.common.collect.ArrayListMultimap;
 import weka.core.DenseInstance;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Basic AI player class that corresponds to the Easy difficulty.
  * This player has random behavior and does not need to be trained by the AI handler.
  */
 public class EasyAIPlayer extends AIPlayer{
-    private Random rand = new Random();
     private float comm_thresh = 0.9f;
 
     EasyAIPlayer(int id, String name, ArrayList<Integer> ids){
         super(id, name, ids);
-    }
-
-    /**
-     * Returns a new Communication that will be sent to a random player, and has a random communication type.
-     */
-    Communication message_action(){
-        if(rand.nextFloat() > this.comm_thresh){
-            int num_coms = CommType.values().length;
-            CommType comm_type = CommType.values()[rand.nextInt(num_coms)];
-            int receiver = this.enemy_ids.get(rand.nextInt(this.enemy_ids.size()));
-
-            Communication comm = new Communication(comm_type, this.id, receiver);
-            return comm;
-        }
-        else{
-            return null;
-        }
     }
 
     /**

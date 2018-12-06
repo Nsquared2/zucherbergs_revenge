@@ -196,7 +196,7 @@ public class AIFunctional {
 
         for (int r = 0; r < 2; r++) {
             HashMap<Integer, Action> ai_actions = ai.round_action();
-            ActionType action = ai_actions.get(0).getAction();
+            ActionType action = ai_actions.get(1).getAction();
 
             HashMap<Integer, ActionType> dummy_results = new HashMap<>();
             dummy_results.put(1, dummy_choice);

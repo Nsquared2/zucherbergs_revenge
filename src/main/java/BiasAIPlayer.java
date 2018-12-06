@@ -1,4 +1,3 @@
-import com.google.common.collect.ArrayListMultimap;
 import weka.core.DenseInstance;
 
 import java.util.ArrayList;
@@ -14,11 +13,23 @@ import java.lang.Math;
 public class BiasAIPlayer extends AIPlayer{
     private Random rand = new Random();
     private float comm_thresh = 0.9f;
-    private int bias;
+    private double bias;
+    private CommType bias_comm;
+    private ActionType bias_action;
+    private HashMap<Integer, Boolean> active;
 
     BiasAIPlayer(int id, String name, ArrayList<Integer> ids){
         super(id, name, ids);
-        this.bias = this.rand.nextInt(3);
+        this.bias = 0.65;
+        int num_coms = CommType.values().length;
+        this.bias_comm = CommType.values()[rand.nextInt(num_coms)];
+        int num_actions = ActionType.values().length;
+        this.bias_action = ActionType.values()[rand.nextInt(num_actions)];
+
+        this.active = new HashMap<>();
+        for(int enemy: this.enemy_ids){
+            this.active.put(enemy, false);
+        }
 
     }
 
@@ -26,17 +37,19 @@ public class BiasAIPlayer extends AIPlayer{
      * Returns a new Communication that will be sent to a random player, and has a random communication type.
      */
     Communication message_action(){
-        if(rand.nextFloat() > this.comm_thresh){
-            int num_coms = CommType.values().length;
-            CommType comm_type = CommType.values()[rand.nextInt(num_coms)];
-            int receiver = this.enemy_ids.get(rand.nextInt(this.enemy_ids.size()));
+        int num_coms = CommType.values().length;
+        CommType comm_type;
+        int receiver = this.enemy_ids.get(rand.nextInt(this.enemy_ids.size()));
 
-            Communication comm = new Communication(comm_type, this.id, receiver);
-            return comm;
+        if(Math.random() > this.bias) {
+            comm_type = this.bias_comm;
+            this.active.put(receiver, true);
         }
-        else{
-            return null;
-        }
+        else
+            comm_type = CommType.values()[rand.nextInt(num_coms)];
+
+        Communication comm = new Communication(comm_type, this.id, receiver);
+        return comm;
     }
 
     /**
@@ -49,13 +62,14 @@ public class BiasAIPlayer extends AIPlayer{
         HashMap<Integer, Action> actions = new HashMap<>();
 
         for(int reciever: this.enemy_ids) {
-            int action_id;
-            if(Math.random() > 0.8)
-                action_id = this.bias;
-            else
-                action_id = rand.nextInt(num_actions);
+            ActionType action_type;
 
-            ActionType action_type = ActionType.values()[action_id];
+            if(this.active.get(reciever))
+                action_type = this.bias_action;
+            else if (Math.random() > 0.9)
+                action_type = this.bias_action;
+            else
+                action_type = ActionType.values()[rand.nextInt(num_actions)];
 
             Action action = new Action(action_type, this.id, reciever);
             actions.put(reciever, action);
@@ -83,6 +97,9 @@ public class BiasAIPlayer extends AIPlayer{
 
         //Add new layer to rcv comms for next round
         addMapLayer();
+        for(int enemy: this.enemy_ids){
+            this.active.put(enemy, false);
+        }
     }
 }
 

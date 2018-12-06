@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -12,6 +9,7 @@ import weka.core.Instances;
  * This is an abstract class, so the different AI difficulties will implement the message/action/policy updating in different ways.
  */
 public abstract class AIPlayer extends Object{
+    protected Random rand = new Random();
     protected int id;
     private String name;
     protected ArrayList<Integer> enemy_ids;
@@ -101,9 +99,16 @@ public abstract class AIPlayer extends Object{
     int getId(){return this.id;}
 
     /**
-     * Returns the Communication that the AI would like to send.
+     * Returns a new Communication that will be sent to a random player, and has a random communication type.
      */
-    abstract Communication message_action();
+    Communication message_action(){
+        int num_coms = CommType.values().length;
+        CommType comm_type = CommType.values()[rand.nextInt(num_coms)];
+        int receiver = this.enemy_ids.get(rand.nextInt(this.enemy_ids.size()));
+
+        Communication comm = new Communication(comm_type, this.id, receiver);
+        return comm;
+    }
 
     /**
      * Returns a list of Actions that the AI would like to perform,
