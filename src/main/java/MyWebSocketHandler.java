@@ -213,7 +213,11 @@ public class MyWebSocketHandler {
         int numHumans = Integer.parseInt(input.get(2));
         int numAIs = Integer.parseInt(input.get(3));
         String difficulty = input.get(4);
-        GameSession g = new GameSession(name, numHumans, numAIs, numRounds, difficulty);
+        boolean bias = false;
+        if (input.indexOf("biased") != -1) {
+            bias = true;
+        }
+        GameSession g = new GameSession(name, numHumans, numAIs, numRounds, difficulty, bias);
         currentGames.put(g.getSessionId(), g);
 
         System.out.println("Added game: " + g.getName() + " and we have " + currentGames.values().size() + " current games");

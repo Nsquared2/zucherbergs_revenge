@@ -1,6 +1,3 @@
-// clear shell games
-document.getElementById("open-games").innerHTML = "";
-
 // writes a cookie
 function setCookie(cname, cvalue, minutes) {
     var d = new Date();
@@ -25,6 +22,9 @@ function getCookie(cname) {
     return "";
 }
 
+// get the player's username as soon as they open the page
+setCookie("playername",prompt("Player Name"),10);
+
 var Game = function(id, name, maxox, ox, rounds){
   this.id = id;
   this.name = name;
@@ -33,33 +33,31 @@ var Game = function(id, name, maxox, ox, rounds){
   this.rounds = rounds;
 }
 
+// generates HTML to add to the game list
 Game.prototype.show = function(){
   game = "<div class='open-game' onclick='joingame("+this.id+");'>"+this.name+"<br>"+this.occupancy+"/"+this.maxox+" | "+this.rounds+" rounds </div>";
   document.getElementById("open-games").innerHTML += game;
 }
 
 
-setCookie("playername",prompt("Player Name"),10);
-
+// connect to server
 var ws = new WebSocket("ws://172.20.44.27:8090/");
 
 ws.onopen = function(){
   // declare new player
   ws.send("newplayer "+getCookie("playername"));
 
-
-  // get the public games
+  // ask for the public games
   ws.send("game_info");
 }
 
-// when a message is recieved from the server, parse it and decide how to update the interface/game information
-
+// when a message is recieved from the server, parse it
+// and decide how to update the interface/game information
 ws.onmessage = function (evt) {
   console.log("IN : " + evt.data);
   message = evt.data.split(", ");
   switch(message[0]){
     case "game":
-      // the message is a message to display in the chat
       id = message[1];
       name = message[2];
       maxox = message[3];
@@ -69,12 +67,15 @@ ws.onmessage = function (evt) {
       game.show();
       break;
     case "newplayer":
+      // gives you your player ID (to save in cookie)
       setCookie("playerid",message[1],10);
       break;
     case "game_joined":
+      // redirects you to game page
       window.location.href = "../frontend/game.html";
       break;
     case "game_join_failed":
+      // refresh available games
       ws.send("game_info");
       break;
   }
@@ -85,15 +86,14 @@ ws.onmessage = function (evt) {
 ws.onclose = function() {
     alert("Connection to server closed");
 };
-ws.onerror = function(err) {
-    alert("Error: " + err);
-};
 
+// for joining games
 function joingame(id){
   ws.send("joingame " + getCookie("playerid") + " " +id);
   console.log("OUT: joingame " + getCookie("playerid") + " " +id);
 }
 
+// press button to send game code
 document.getElementById("sendgamecode").addEventListener("click",function(){
   ws.send("join_private " + getCookie("playerid") + " " + document.getElementById("gamecode").value);
   console.log("OUT: join_private " + getCookie("playerid") + " " + document.getElementById("gamecode").value);

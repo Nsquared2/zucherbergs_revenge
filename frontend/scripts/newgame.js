@@ -1,10 +1,12 @@
 // establish connection to server
 var ws = new WebSocket("ws://172.20.44.27:8090/");
 
+// enable time limit field only when time limit is checked
 document.getElementById("timeLimitCheck").addEventListener("change",function(){
   document.getElementById("timeLimit").disabled = !this.checked;
 });
 
+// enable game code field only when game is private
 document.getElementById("gameCodeCheck").addEventListener("change",function(){
   document.getElementById("gameCode").disabled = !this.checked;
 });
@@ -37,11 +39,18 @@ document.getElementById("submit").addEventListener("click",function(event){
     message += document.getElementById("gameCode").value;
   }
 
-  console.log(message);
-  ws.send(message);
+  if(document.getElementById("biased").checked){
+    message += " biased";
+  }
 
+  // send the message
+  ws.send(message);
+  console.log(message);
+
+  // don't actually send the form
   event.preventDefault();
 
+  // after game creation, redirect to index
   window.location.href = "../frontend/index.html";
   
 });

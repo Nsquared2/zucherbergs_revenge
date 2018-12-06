@@ -38,7 +38,11 @@ var Player = function(id, name){
 
 // produces HTML to display player in player list on left of UI
 Player.prototype.html = function(){
-  return  '<div class="player-container" onclick="game.focusOn('+this.id+');"><div class="player"><div class="name">'+this.name+'</div><div class="request">requesting: <div class="'+this.requesting+'">'+this.requesting+'</div></div>'+
+  selected = "";
+  if(game.currentPlayer.id == this.id){
+    selected = "selected";
+  }
+  return  '<div class="player-container" onclick="game.focusOn('+this.id+');"><div class="player"><div class="name '+selected+'">'+this.name+'</div><div class="request">requesting: <div class="'+this.requesting+'">'+this.requesting+'</div></div>'+
           '<button class="action cooperate '+((this.action == "cooperate") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'cooperate\');">cooperate</button>'+
           '<button class="action ignore '+((this.action == "ignore") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'ignore\');">ignore</button>'+
           '<button class="action betray '+((this.action == "betray") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'betray\');">betray</button>'+
@@ -110,8 +114,12 @@ Game.prototype.getPlayer = function(id){
   return false;
 }
 
-// displays info in dash for the currently selected player
+// updates info in dash for the currently selected player
+// updates selected player
+// updates messages pane
 Game.prototype.updateCurrentPlayer = function(){
+  this.updatePlayers();
+
   document.getElementById("messages-pane").innerHTML = this.currentPlayer.allMessages();
   document.getElementById("messages-pane").scrollTop = document.getElementById("messages-pane").scrollHeight;
   
@@ -193,11 +201,12 @@ function appendMessage(text, who){
   document.getElementById("messages-pane").innerHTML += message;
 }
 
+// instantiate game constants
 me = new You();
-
 game = new Game("GAMENAME", 100, false, me);
 
-// when a message is recieved from the server, parse it and decide how to update the interface/game information
+// when a message is recieved from the server, parse it
+// and decide how to update the interface/game information
 ws.onmessage = function (evt) {
   console.log("IN : " + evt.data);
   message = evt.data.split(" ");
@@ -245,6 +254,7 @@ ws.onmessage = function (evt) {
   }
 };
 
+// tell the server you've joined the game
 ws.onopen = function() {
   ws.send("update_player "+me.id);
 }
@@ -253,10 +263,6 @@ ws.onopen = function() {
 ws.onclose = function() {
     alert("Connection to server closed");
 };
-ws.onerror = function(err) {
-    alert("Error: " + err);
-};
-
 
 
 // when a request message is selected, send it to the server
@@ -278,6 +284,7 @@ document.getElementById("action-select").addEventListener("change",function(){
   game.changeAction(game.currentPlayer.id,game.currentPlayer.action);
 });
 
+// when actions are confirmed, notify the server
 document.getElementById("confirm").addEventListener("click", function(){
   ws.send("confirm");
   console.log("OUT: confirm");
