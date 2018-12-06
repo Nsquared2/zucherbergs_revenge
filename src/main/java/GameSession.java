@@ -334,23 +334,23 @@ public class GameSession {
             case COOPERATE:
                 switch(theirAction) {
                     case COOPERATE:
-                        return 2;
+                        return 4;
                     case BETRAY:
-                        return -1;
+                        return -4;
                     case IGNORE:
-                        return 1;
+                        return 2;
                 }
             case BETRAY:
                 switch(theirAction) {
                     case COOPERATE:
-                        return 1;
+                        return 6;
                     case BETRAY:
-                        return -1;
+                        return -5;
                     case IGNORE:
-                        return 0;
+                        return 1;
                 }
             case IGNORE:
-                return 0;
+                return theirAction == ActionType.BETRAY ? 0 : 1;
 
             default:
                     return 1;
