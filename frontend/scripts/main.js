@@ -1,5 +1,5 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.27.209:8090/");
+var ws = new WebSocket("ws://172.20.13.110:8090/");
 
 // writes a cookie
 function setCookie(cname, cvalue, minutes) {
@@ -269,7 +269,7 @@ ws.onclose = function() {
 // when a request message is selected, send it to the server
 document.getElementById("request-select").addEventListener("change",function(){
   game.currentPlayer.requesting = document.getElementById("request-select").value;
-  game.sendRequest(game.currentPlayer.id,game.currentPlayer.request);
+  game.sendRequest(game.currentPlayer.id,game.currentPlayer.requesting);
 });
 
 // when an announce message is selected, send it to the server
