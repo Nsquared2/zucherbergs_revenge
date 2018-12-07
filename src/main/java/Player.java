@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class Player {
     private String playerName;
+    private String anonymousName;
     private int playerId;
     private Session webSocketSession;
     private Map<Integer, ActionType> currentActions;
@@ -117,5 +118,13 @@ public class Player {
 
     public String getPlayerName() {
         return playerName;
+    }
+
+    public void setAnonymousName(int i) {
+        this.anonymousName = "Player_" + i;
+    }
+
+    public String getAnonymousName() {
+        return this.anonymousName;
     }
 }
