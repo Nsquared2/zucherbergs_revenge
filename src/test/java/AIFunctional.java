@@ -11,7 +11,7 @@ public class AIFunctional {
      * AI players should learn strategies of other players
      */
     @Test
-    public void AI2() {
+    public void AI1_2() {
         ActionType dummy_choice = ActionType.BETRAY;
         AIPlayer ai = AIHandler.createAi("medium", 0, "joe", AITestUtil.dummy_ids(1));
         ActionType correct_action = ai.maximizeValue(dummy_choice);
@@ -133,7 +133,7 @@ public class AIFunctional {
      * Game data should be saved externally in between games
      */
     @Test
-    public void AI6(){
+    public void AI5_6(){
         File folder = new File("./ai_test/dummy_save/");
         deleteFiles(folder);
         AIHandler.setDataPathForTesting("./ai_test/dummy_save/");
