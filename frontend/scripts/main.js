@@ -42,7 +42,7 @@ Player.prototype.html = function(){
   if(game.currentPlayer.id == this.id){
     selected = "selected";
   }
-  return  '<div class="player-container" onclick="game.focusOn('+this.id+');"><div class="player"><div class="name '+selected+'">'+this.name+'</div><div class="request">requesting: <div class="'+this.requesting+'">'+this.requesting+'</div></div>'+
+  return  '<div class="player-container" onclick="game.focusOn('+this.id+');"><div class="player"><div class="name '+selected+'">'+this.name+'</div>'+
           '<button class="action cooperate '+((this.action == "cooperate") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'cooperate\');">cooperate</button>'+
           '<button class="action ignore '+((this.action == "ignore") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'ignore\');">ignore</button>'+
           '<button class="action betray '+((this.action == "betray") ? "selected" : "")+'" onclick="event.stopPropagation(); game.changeAction('+this.id+',\'betray\');">betray</button>'+
@@ -216,6 +216,7 @@ ws.onmessage = function (evt) {
       game.rounds = parseInt(message[4]);
       game.round = parseInt(message[5]);
       game.time_limit = parseInt(message[5]);
+      game.update_info();
       break;
     case "player":
       // info about a player in this game
@@ -267,7 +268,7 @@ ws.onclose = function() {
 
 // when a request message is selected, send it to the server
 document.getElementById("request-select").addEventListener("change",function(){
-  game.currentPlayer.request = document.getElementById("request-select").value;
+  game.currentPlayer.requesting = document.getElementById("request-select").value;
   game.sendRequest(game.currentPlayer.id,game.currentPlayer.request);
 });
 

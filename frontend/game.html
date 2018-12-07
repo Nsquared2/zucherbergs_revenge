@@ -54,14 +54,47 @@
         </select>
         <br>
 
+        <div class="rules-pane">
+        &nbsp &nbsp Scoring
+        <table class="rules">
+          <tr>
+            <td>↓you &nbsp <font color="blue">them→</font></td>
+            <td><font color="blue">cooperate</font></td>
+            <td><font color="blue">ignore</font></td>
+            <td><font color="blue">betray</font></td>
+          </tr>
+          <tr>
+            <td>cooperate</td>
+            <td>4</td>
+            <td>2</td>
+            <td>-4</td>
+          </tr>
+          <tr>
+            <td>ignore</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td>betray</td>
+            <td>6</td>
+            <td>1</td>
+            <td>-5</td>
+          </tr>
+        </table>
+
+      </div>
+
+      
+
       </div>
 
       <div class="game-info-pane">
         <div class="game-info-container">
           
           <div class="score" id="score">Score: 0<br>Place: </div>
-          <div class="round" id="round">Round 8/12</div>
-          <div class="timer" id="timer">Not Timed</div>
+          <div class="round" id="round">Round /</div>
+          <!-- <div class="timer" id="timer">Not Timed</div> --> 
           <button class="confirm" id="confirm">confirm actions</button>
         </div>
       </div>
