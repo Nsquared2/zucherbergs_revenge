@@ -1,5 +1,5 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.13.110:8090/");
+var ws = new WebSocket("ws://172.20.42.147:8090/");
 
 // enable time limit field only when time limit is checked
 document.getElementById("timeLimitCheck").addEventListener("change",function(){

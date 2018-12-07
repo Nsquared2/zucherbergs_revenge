@@ -66,7 +66,8 @@ public class BiasAIPlayer extends AIPlayer{
 
             if(this.active.get(reciever))
                 action_type = this.bias_action;
-            else if (Math.random() > 0.9)
+            // TODO: change back to 0.9 once messages are implemented
+            else if (Math.random() > this.bias)
                 action_type = this.bias_action;
             else
                 action_type = ActionType.values()[rand.nextInt(num_actions)];

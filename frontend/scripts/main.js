@@ -1,5 +1,6 @@
 // establish connection to server
-var ws = new WebSocket("ws://172.20.13.110:8090/");
+var ws = new WebSocket("ws://172.20.42.147:8090/");
+
 
 // writes a cookie
 function setCookie(cname, cvalue, minutes) {
