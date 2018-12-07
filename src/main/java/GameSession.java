@@ -105,16 +105,16 @@ public class GameSession {
         for (int i = 0; i < numOfAI; i++) {
             if (i < numOfAI - 1) {
                 AIPlayer newAi = AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
-                newAi.setAnonymousName(playerMap.size() + i);
+                newAi.setAnonymousName(playerMap.size() + i + 1);
                 aiPlayers.add(newAi);
             } else {
                 if (bias) {
                     AIPlayer newAi = AIHandler.createAi("bias", aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
-                    newAi.setAnonymousName(playerMap.size() + i);
+                    newAi.setAnonymousName(playerMap.size() + i + 1);
                     aiPlayers.add(newAi);
                 } else {
                     AIPlayer newAi = AIHandler.createAi(difficulty, aiIds.get(i), "AI_" + i, new ArrayList<>(enemyIds));
-                    newAi.setAnonymousName(playerMap.size() + i);
+                    newAi.setAnonymousName(playerMap.size() + i + 1);
                     aiPlayers.add(newAi);
                 }
             }
