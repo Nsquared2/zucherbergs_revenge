@@ -114,10 +114,10 @@ public class AIHandler {
      */
     static private <C extends Classifier> void initializeModel(C model, String path){
         // check if model exists, if so load
-//        try {
-//            model = (C) weka.core.SerializationHelper.read(path);
-//        }
-//        catch (Exception e){
+        try {
+            model = (C) weka.core.SerializationHelper.read(path);
+        }
+        catch (Exception e){
             //TODO: catch specific exception}
             try{
                 Instances dataset = WekaData.makeDataset();
@@ -126,7 +126,7 @@ public class AIHandler {
             catch (Exception f){
                 System.out.println("Exception in building classifier " + f.toString());
             }
-//        }
+        }
     }
 
     static private <C extends Classifier> void trainClassifierWithGameData(C model){
